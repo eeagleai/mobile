@@ -9,10 +9,12 @@ class HomeSiteListTile extends StatelessWidget {
     super.key,
     required this.site,
     required this.onTap,
+    required this.onPreviewTap,
   });
 
   final Site site;
   final VoidCallback onTap;
+  final VoidCallback onPreviewTap;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +63,14 @@ class HomeSiteListTile extends StatelessWidget {
                       ),
                     ],
                   ],
+                ),
+              ),
+              IconButton(
+                tooltip: 'Preview website',
+                onPressed: onPreviewTap,
+                icon: Icon(
+                  Icons.open_in_new,
+                  color: colors.palette.primary.shade400,
                 ),
               ),
               Icon(

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:eeagle_ai/src/core/config/api_config.dart';
+import 'package:eeagle_ai/src/core/logging/app_logger.dart';
 import 'package:eeagle_ai/src/core/util/page_url_util.dart';
 import 'package:eeagle_ai/src/domain/model/chat_connection_phase.dart';
 import 'package:eeagle_ai/src/domain/model/chat_inbound_event.dart';
@@ -12,6 +13,7 @@ import 'package:eeagle_ai/src/domain/use_case/disconnect_chat_session_use_case.d
 import 'package:eeagle_ai/src/domain/use_case/mint_chat_token_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/send_chat_message_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/watch_chat_inbound_events_use_case.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -214,9 +216,11 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
           ),
         );
       case ChatInboundAssistantFinishedEvent():
+        final finishedMessages = _finishAssistantTurn();
+        _logFinishedAssistantMessage(finishedMessages);
         emit(
           state.copyWith(
-            messages: _finishAssistantTurn(),
+            messages: finishedMessages,
             connectionPhase: ChatConnectionPhase.idle,
           ),
         );
@@ -353,6 +357,19 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
       messages = _appendAssistantFallback(messages);
     }
     return messages;
+  }
+
+  void _logFinishedAssistantMessage(List<ChatMessage> messages) {
+    if (!kDebugMode || messages.isEmpty) {
+      return;
+    }
+
+    final last = messages.last;
+    if (last.role != ChatMessageRole.assistant) {
+      return;
+    }
+
+    appLogger.d('chat assistant finished:\n${last.content}');
   }
 
   bool _needsAssistantFallback(List<ChatMessage> messages) {

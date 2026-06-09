@@ -5,6 +5,7 @@ import 'package:eeagle_ai/src/presentation/home/bloc/sites_bloc.dart';
 import 'package:eeagle_ai/src/presentation/home/widgets/home_logout_button.dart';
 import 'package:eeagle_ai/src/presentation/home/widgets/home_site_list_tile.dart';
 import 'package:eeagle_ai/src/presentation/home/widgets/home_site_list_tile_shimmer.dart';
+import 'package:eeagle_ai/src/presentation/home/widgets/home_site_preview_sheet.dart';
 import 'package:eeagle_ai/src/presentation/navigation/routes/routes_constants.dart';
 import 'package:eeagle_ai/src/presentation/ui/components/eeagle_screen_background.dart';
 import 'package:eeagle_ai/src/presentation/ui/theme/eeagle_colors.dart';
@@ -41,6 +42,10 @@ class _HomeSitesView extends StatelessWidget {
       RoutesConstants.llmChat,
       arguments: site,
     );
+  }
+
+  void _previewSite(BuildContext context, Site site) {
+    showHomeSitePreviewSheet(context, site: site);
   }
 
   @override
@@ -168,6 +173,7 @@ class _HomeSitesView extends StatelessWidget {
           return HomeSiteListTile(
             site: site,
             onTap: () => _openSiteChat(context, site),
+            onPreviewTap: () => _previewSite(context, site),
           );
         },
       ),
