@@ -1,0 +1,105 @@
+---
+alwaysApply: true
+---
+
+Be concise in your response.
+Always use meaningful variable, method, function, and class names — don't name x, y, z, a, etc.
+
+🚧 Cursor Rule: API Feature Implementation
+
+When implementing any feature that interacts with the backend (Dio/REST/etc), you MUST follow this structure:
+
+1. Data Layer (Implementation only)
+
+Create/update repository implementation inside:
+
+lib/src/data/repository/
+Responsibilities:
+Call Dio via shared client from lib/src/core/network/
+Map DTO ↔ Domain Entities
+Catch DioException and map to OperationFailure
+❌ Do NOT expose data models to presentation layer
+2. Domain Layer (Pure business logic)
+a. Repository Contract
+
+Define abstract repository in:
+
+lib/src/domain/repository/
+Return TaskEither<OperationFailure, T> (fpdart)
+b. Use Case (MANDATORY)
+
+Create a dedicated use case in:
+
+lib/src/domain/use_case/
+Each use case = one clear action
+No UI / Flutter imports allowed
+3. Presentation Layer
+a. Bloc (MANDATORY)
+
+Location:
+
+lib/src/presentation/<feature>/bloc/
+Must include:
+event
+state
+bloc
+Uses only use cases, never repositories directly
+b. Screen
+
+Location:
+
+lib/src/presentation/<feature>/<feature>_screen.dart
+Responsibilities:
+Provide Bloc
+Handle navigation
+Compose UI
+c. Widgets (MANDATORY separation)
+
+All UI components go inside:
+
+lib/src/presentation/<feature>/widgets/
+❌ No large UI inside screen
+❌ No business logic inside widgets
+4. Dependency Injection
+Register:
+Repository implementation
+Use case
+Bloc
+
+Inside:
+
+lib/src/di/register_module.dart
+🔥 Strict Rules (Non-negotiable)
+❌ UI must NEVER call Dio directly
+❌ Bloc must NEVER call repository implementation directly
+❌ Skip layers = NOT allowed (no shortcuts)
+❌ No logic inside widgets except UI logic
+❌ No mixing data models with domain entities
+✅ Flow Summary
+UI (Screen)
+   ↓
+Bloc
+   ↓
+Use Case
+   ↓
+Repository (abstract)
+   ↓
+Repository Impl (Dio)
+   ↓
+API
+🧠 Naming Convention
+
+Example: CreateGroup
+
+Use case → create_group_use_case.dart
+Bloc → create_group_bloc.dart
+Screen → create_group_screen.dart
+Widgets → widgets/
+Repo method → createGroup()
+💡 Optional (but highly recommended)
+Use freezed for:
+states
+events
+models
+Use OperationFailure for non-auth errors
+Always return TaskEither<OperationFailure, Result>

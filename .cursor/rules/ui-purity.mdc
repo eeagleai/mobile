@@ -1,0 +1,111 @@
+---
+alwaysApply: true
+---
+
+🚨 STRICT RULE: UI LAYER PURITY (NON-NEGOTIABLE)
+🔒 Core Principle
+
+The UI (Screens & Widgets) MUST be 100% passive.
+It can ONLY:
+
+read Bloc state
+send Bloc events
+render UI
+❌ ABSOLUTELY FORBIDDEN IN UI
+1. 🚫 No Network / API Access — EVER
+❌ di<Dio>()
+❌ Dio() direct instantiation
+❌ HTTP calls from widgets or screens
+
+✔ Instead:
+
+state.currentUserId
+state.items
+2. 🚫 No Dependency Injection Calls
+❌ di<Something>() inside build()
+❌ di<Something>() inside widget
+
+✔ Only allowed:
+
+BlocProvider(create: (_) => di<MyBloc>())
+3. 🚫 No Business Logic
+❌ isGroupAdmin(...)
+❌ isGroupCreator(...)
+❌ permission checks
+
+✔ Must come from:
+
+state.canEdit
+state.isCreator
+4. 🚫 No Data Transformation
+❌ .where(...)
+❌ .map(...)
+❌ .sort(...)
+❌ filtering / grouping / formatting lists
+
+✔ Must come from:
+
+state.sortedMembers
+state.filteredUsers
+5. 🚫 No Domain Logic Imports
+❌ import domain logic helpers into UI
+
+✔ UI only consumes ready-to-use state
+
+6. 🚫 No Route Argument Parsing
+❌ ModalRoute.of(context)
+
+✔ Use:
+
+constructor params
+OR
+typed navigation
+7. 🚫 No Manual Object Construction
+❌ Creating entities/models inside UI
+✅ REQUIRED INSTEAD
+✔ UI Must Only Do This:
+final state = context.watch<EditGroupBloc>().state;
+
+return SomeWidget(
+  users: state.availableUsers,
+  members: state.sortedMembers,
+  canEdit: state.canEdit,
+);
+🧠 DATA FLOW (ENFORCED)
+UI (0 logic)
+   ↓
+Bloc (derives UI state)
+   ↓
+UseCase (business logic)
+   ↓
+Repository
+   ↓
+Dio / API
+🔥 ENFORCEMENT RULE (VERY IMPORTANT)
+
+If a UI file contains ANY of the following:
+
+Dio or direct HTTP usage
+.sort(), .where(), .map()
+permission checks
+DI calls
+
+➡️ It MUST be refactored immediately
+
+🧪 TEST RULE (Quick Check)
+
+Ask yourself:
+
+“Can I fully test this UI by mocking ONLY the Bloc state?”
+
+✅ YES → correct
+❌ NO → architecture is broken
+⚡ SHORT VERSION (FOR CURSOR)
+
+UI must be a pure renderer:
+
+No Dio / HTTP
+No DI
+No logic
+No data transformation
+Only Bloc state + events

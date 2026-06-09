@@ -1,0 +1,104 @@
+---
+alwaysApply: true
+---
+
+🚧 Cursor Rule: Models MUST use Freezed
+🔒 Mandatory Rule
+All models MUST be created using:
+freezed
+json_serializable
+📁 Where to Use Freezed
+1. Data Layer Models (DTOs)
+
+Location:
+
+lib/src/data/models/
+✅ Requirements:
+Must use @freezed
+Must include:
+.freezed.dart
+.g.dart
+
+Must support JSON:
+
+factory Model.fromJson(Map<String, dynamic> json) => _$ModelFromJson(json);
+✅ Example:
+@freezed
+class UserProfileModel with _$UserProfileModel {
+  const factory UserProfileModel({
+    required String id,
+    required String email,
+    String? name,
+  }) = _UserProfileModel;
+
+  factory UserProfileModel.fromJson(Map<String, dynamic> json)
+      => _$UserProfileModelFromJson(json);
+}
+2. Domain Entities (Optional but Recommended)
+
+Location:
+
+lib/src/domain/entities/
+Rules:
+Use Freezed only if:
+You need immutability
+You need unions/sealed classes
+❌ No JSON in domain layer
+3. Bloc (MANDATORY Freezed)
+Events:
+<feature>_event.dart
+States:
+<feature>_state.dart
+Rules:
+MUST use Freezed unions
+No manual classes allowed
+✅ Example:
+@freezed
+class LoginEvent with _$LoginEvent {
+  const factory LoginEvent.loginRequested({
+    required String email,
+    required String password,
+  }) = _LoginRequested;
+}
+@freezed
+class LoginState with _$LoginState {
+  const factory LoginState.initial() = _Initial;
+  const factory LoginState.loading() = _Loading;
+  const factory LoginState.success() = _Success;
+  const factory LoginState.failure(String message) = _Failure;
+}
+🔥 Strict Enforcement Rules
+❌ No plain Dart classes for models
+❌ No mutable fields
+❌ No manual copyWith
+❌ No Equatable (Freezed replaces it)
+❌ No JSON logic outside data models
+⚙️ Required Setup
+
+Make sure these are in pubspec.yaml:
+
+dependencies:
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.9.0
+
+dev_dependencies:
+  build_runner: ^2.4.15
+  freezed: ^3.1.0
+  json_serializable: ^6.9.5
+▶️ Code Generation Command
+dart run build_runner build --delete-conflicting-outputs
+🧠 Extra Best Practices
+Always add const constructors
+Prefer required fields
+Use @Default() for defaults
+Use unions for:
+API responses
+Bloc states/events
+✅ Final Combined Rule (Short Version for Cursor)
+
+When creating any model, state, or event:
+
+MUST use Freezed
+MUST generate .freezed.dart and .g.dart
+MUST keep JSON only in data layer
+MUST keep immutability

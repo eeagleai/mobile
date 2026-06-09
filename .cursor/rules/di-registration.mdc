@@ -1,0 +1,87 @@
+---
+alwaysApply: true
+---
+
+🚧 Cursor Rule: Dependency Registration (MANDATORY)
+🔒 Core Rule
+
+Every Repository, UseCase, and Bloc MUST be registered inside:
+
+lib/src/di/register_module.dart
+📦 What MUST be Registered
+1. Repositories
+Interface → in lib/src/domain/repository
+Implementation → in lib/src/data/repository
+✅ Registration:
+@lazySingleton
+CounterRepository counterRepository(Dio dio) =>
+    CounterRepositoryImpl(dio);
+2. Use Cases
+Location:
+lib/src/domain/use_case/
+✅ Registration:
+@factoryMethod
+CreateGroupUseCase createGroupUseCase(
+  GroupsRepository repository,
+) =>
+    CreateGroupUseCase(repository);
+3. Blocs
+Location:
+lib/src/presentation/<feature>/bloc/
+✅ Registration:
+@factoryMethod
+CreateGroupBloc createGroupBloc(
+  CreateGroupUseCase createGroupUseCase,
+) =>
+    CreateGroupBloc(createGroupUseCase);
+🔥 Strict Rules (No Exceptions)
+❌ No direct instantiation using new or constructors in UI
+❌ No BlocProvider(create: ...) with manual Bloc construction
+❌ No repository or use case used without DI
+❌ No missing registration (build must fail if missing)
+🧠 Naming Convention
+Type	Annotation
+Repository	@lazySingleton
+UseCase	@factoryMethod
+Bloc	@factoryMethod
+Dio / shared services	@lazySingleton
+🔄 Injection Flow
+Screen
+  ↓
+Bloc (injected via di<Bloc>())
+  ↓
+UseCase (injected)
+  ↓
+Repository (injected)
+⚙️ Required Build Step
+
+After adding anything new:
+
+dart run build_runner build --delete-conflicting-outputs
+🧩 Example Full Flow
+Register Module
+@module
+abstract class RegisterModule {
+  @lazySingleton
+  Dio dio() => DioClient.create();
+
+  @lazySingleton
+  GroupsRepository groupsRepository(Dio dio) =>
+      GroupsRepositoryImpl(dio);
+
+  @factoryMethod
+  CreateGroupUseCase createGroupUseCase(GroupsRepository repo) =>
+      CreateGroupUseCase(repo);
+
+  @factoryMethod
+  CreateGroupBloc createGroupBloc(CreateGroupUseCase useCase) =>
+      CreateGroupBloc(useCase);
+}
+✅ Final Cursor Enforcement Rule
+
+When creating any feature:
+
+MUST register Repository, UseCase, and Bloc in register_module.dart
+MUST use @lazySingleton for repositories and shared services
+MUST use @factoryMethod for use cases and blocs
+MUST NOT instantiate dependencies manually anywhere else
