@@ -6,9 +6,11 @@ class LlmChatMessageList extends StatefulWidget {
   const LlmChatMessageList({
     super.key,
     required this.messages,
+    required this.onPageLinkTap,
   });
 
   final List<ChatMessage> messages;
+  final ValueChanged<String> onPageLinkTap;
 
   @override
   State<LlmChatMessageList> createState() => _LlmChatMessageListState();
@@ -23,7 +25,9 @@ class _LlmChatMessageListState extends State<LlmChatMessageList> {
     if (widget.messages.length != oldWidget.messages.length ||
         (widget.messages.isNotEmpty &&
             oldWidget.messages.isNotEmpty &&
-            widget.messages.last.content != oldWidget.messages.last.content)) {
+            (widget.messages.last.content != oldWidget.messages.last.content ||
+                widget.messages.last.clickablePageLinks !=
+                    oldWidget.messages.last.clickablePageLinks))) {
       _scrollToBottom();
     }
   }
@@ -56,7 +60,10 @@ class _LlmChatMessageListState extends State<LlmChatMessageList> {
       itemCount: widget.messages.length,
       separatorBuilder: (context, index) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
-        return LlmChatMessageBubble(message: widget.messages[index]);
+        return LlmChatMessageBubble(
+          message: widget.messages[index],
+          onPageLinkTap: widget.onPageLinkTap,
+        );
       },
     );
   }

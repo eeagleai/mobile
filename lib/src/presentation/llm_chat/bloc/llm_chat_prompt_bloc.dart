@@ -2,6 +2,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:eeagle_ai/src/data/service/attachment_picker_service.dart';
 import 'package:eeagle_ai/src/data/service/speech_to_text_service.dart';
 import 'package:eeagle_ai/src/domain/model/prompt_attachment.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -10,8 +11,13 @@ part 'llm_chat_prompt_state.dart';
 part 'llm_chat_prompt_bloc.freezed.dart';
 
 class LlmChatPromptBloc extends Bloc<LlmChatPromptEvent, LlmChatPromptState> {
-  LlmChatPromptBloc(this._speechToText, this._attachmentPicker)
-      : super(const LlmChatPromptState()) {
+  LlmChatPromptBloc(
+    this._speechToText,
+    this._attachmentPicker, {
+    bool? deferSpeechInitialization,
+  })  : _deferSpeechInitialization = deferSpeechInitialization ??
+            (!kIsWeb && defaultTargetPlatform == TargetPlatform.macOS),
+        super(const LlmChatPromptState()) {
     on<_Initialized>(_onInitialized);
     on<_MicToggled>(_onMicToggled, transformer: droppable());
     on<_TextChanged>(_onTextChanged);
@@ -27,6 +33,7 @@ class LlmChatPromptBloc extends Bloc<LlmChatPromptEvent, LlmChatPromptState> {
 
   final SpeechToTextService _speechToText;
   final AttachmentPickerService _attachmentPicker;
+  final bool _deferSpeechInitialization;
   bool _micOperationInProgress = false;
   DateTime? _lastSoundLevelEmit;
 
@@ -72,6 +79,23 @@ class LlmChatPromptBloc extends Bloc<LlmChatPromptEvent, LlmChatPromptState> {
     _Initialized event,
     Emitter<LlmChatPromptState> emit,
   ) async {
+    if (_deferSpeechInitialization) {
+      // macOS crashes if speech/mic permissions are requested during screen
+      // open (Flutter issue #70374). Initialize lazily when the user taps mic.
+      emit(
+        state.copyWith(
+          isInitializing: false,
+          isSpeechAvailable: false,
+          errorMessage: null,
+        ),
+      );
+      return;
+    }
+
+    await _initializeSpeech(emit);
+  }
+
+  Future<bool> _initializeSpeech(Emitter<LlmChatPromptState> emit) async {
     emit(state.copyWith(isInitializing: true, errorMessage: null));
 
     final isAvailable = await _speechToText.initialize(
@@ -82,7 +106,7 @@ class LlmChatPromptBloc extends Bloc<LlmChatPromptEvent, LlmChatPromptState> {
     );
 
     if (emit.isDone) {
-      return;
+      return false;
     }
 
     emit(
@@ -92,6 +116,8 @@ class LlmChatPromptBloc extends Bloc<LlmChatPromptEvent, LlmChatPromptState> {
         errorMessage: isAvailable ? null : 'Speech recognition is unavailable',
       ),
     );
+
+    return isAvailable;
   }
 
   Future<void> _onMicToggled(
@@ -113,7 +139,12 @@ class LlmChatPromptBloc extends Bloc<LlmChatPromptEvent, LlmChatPromptState> {
       }
 
       if (!state.isSpeechAvailable || state.isInitializing) {
-        if (!emit.isDone) {
+        if (_deferSpeechInitialization && !state.isSpeechAvailable) {
+          final isAvailable = await _initializeSpeech(emit);
+          if (emit.isDone || !isAvailable) {
+            return;
+          }
+        } else if (!emit.isDone) {
           emit(
             state.copyWith(
               errorMessage: state.isInitializing
@@ -121,7 +152,11 @@ class LlmChatPromptBloc extends Bloc<LlmChatPromptEvent, LlmChatPromptState> {
                   : 'Speech recognition is unavailable on this device',
             ),
           );
+          return;
         }
+      }
+
+      if (state.isInitializing) {
         return;
       }
 

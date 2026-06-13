@@ -1,8 +1,11 @@
 import 'package:eeagle_ai/src/di/di_container.dart';
 import 'package:eeagle_ai/src/domain/model/site.dart';
+import 'package:eeagle_ai/src/domain/model/site_preview_action.dart';
+import 'package:eeagle_ai/src/presentation/home/widgets/home_site_preview_sheet.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/bloc/llm_chat_prompt_bloc.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/bloc/llm_chat_session_bloc.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/widgets/llm_chat_conversation_body.dart';
+import 'package:eeagle_ai/src/presentation/llm_chat/widgets/llm_chat_page_url_picker_dialog.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/widgets/llm_chat_prompt_input_bar.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/widgets/llm_chat_top_app_bar.dart';
 import 'package:eeagle_ai/src/presentation/ui/components/eeagle_screen_background.dart';
@@ -66,6 +69,42 @@ class _LlmChatView extends StatelessWidget {
               ..showSnackBar(
                 SnackBar(content: Text(state.errorMessage!)),
               );
+          },
+        ),
+        BlocListener<LlmChatSessionBloc, LlmChatSessionState>(
+          listenWhen: (previous, current) =>
+              previous.previewAction != current.previewAction &&
+              current.previewAction != null,
+          listener: (context, state) async {
+            final previewAction = state.previewAction;
+            if (previewAction == null) {
+              return;
+            }
+
+            final sessionBloc = context.read<LlmChatSessionBloc>();
+
+            switch (previewAction) {
+              case SitePreviewActionOpen(:final url):
+                await showSitePreviewSheet(
+                  context,
+                  site: site,
+                  previewUrl: url,
+                );
+              case SitePreviewActionChoose(:final urls):
+                final selectedUrl = await showLlmChatPageUrlPickerDialog(
+                  context,
+                  urls: urls,
+                );
+                if (selectedUrl != null && context.mounted) {
+                  await showSitePreviewSheet(
+                    context,
+                    site: site,
+                    previewUrl: selectedUrl,
+                  );
+                }
+            }
+
+            sessionBloc.add(const LlmChatSessionEvent.previewActionConsumed());
           },
         ),
       ],

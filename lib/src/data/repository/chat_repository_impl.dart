@@ -112,15 +112,10 @@ class ChatRepositoryImpl implements ChatRepository {
           _handleRawFrame,
           onError: (Object error, StackTrace stackTrace) {
             appLogger.w('chat websocket error', error: error, stackTrace: stackTrace);
-            _inboundController.add(
-              ChatInboundEvent.error(error: error.toString()),
-            );
+            unawaited(_notifyConnectionLost());
           },
           onDone: () {
-            // Server (or network) closed the socket.
-            _inboundController.add(
-              const ChatInboundEvent.error(error: 'Chat connection closed.'),
-            );
+            unawaited(_notifyConnectionLost());
           },
         );
 
@@ -200,6 +195,9 @@ class ChatRepositoryImpl implements ChatRepository {
   @override
   Stream<ChatInboundEvent> watchInboundEvents() => _inboundController.stream;
 
+  @override
+  bool get isSessionConnected => _channel != null;
+
   /// Encodes [frame] as JSON and writes it to the socket (no-op if closed).
   void _sendFrame(Map<String, dynamic> frame) {
     logOutboundChatFrame(frame);
@@ -236,6 +234,12 @@ class ChatRepositoryImpl implements ChatRepository {
       // A single bad frame should never crash the connection.
       appLogger.w('chat frame parse failed', error: error, stackTrace: stackTrace);
     }
+  }
+
+  /// Clears a dead socket and notifies listeners without surfacing a chat error.
+  Future<void> _notifyConnectionLost() async {
+    await _disconnectInternal();
+    _inboundController.add(const ChatInboundEvent.connectionLost());
   }
 
   /// Tears down the current connection: stop listening, then close the socket.

@@ -42,10 +42,60 @@ void main() {
     when(() => speechToText.dispose()).thenAnswer((_) async {});
     when(() => attachmentPicker.pickMedia()).thenAnswer((_) async => const []);
     when(() => attachmentPicker.pickFiles()).thenAnswer((_) async => const []);
-    bloc = LlmChatPromptBloc(speechToText, attachmentPicker);
+    bloc = LlmChatPromptBloc(
+      speechToText,
+      attachmentPicker,
+      deferSpeechInitialization: false,
+    );
   });
 
   tearDown(() => bloc.close());
+
+  blocTest<LlmChatPromptBloc, LlmChatPromptState>(
+    'defers speech initialization on macOS until mic is toggled',
+    build: () {
+      when(
+        () => speechToText.initialize(
+          onError: any(named: 'onError'),
+          onStatus: any(named: 'onStatus'),
+        ),
+      ).thenAnswer((_) async => true);
+      when(
+        () => speechToText.startListening(
+          onResult: any(named: 'onResult'),
+          onSoundLevel: any(named: 'onSoundLevel'),
+        ),
+      ).thenAnswer((_) async => true);
+      return LlmChatPromptBloc(
+        speechToText,
+        attachmentPicker,
+        deferSpeechInitialization: true,
+      );
+    },
+    act: (bloc) async {
+      bloc.add(const LlmChatPromptEvent.initialized());
+      await Future<void>.delayed(Duration.zero);
+      bloc.add(const LlmChatPromptEvent.micToggled());
+    },
+    expect: () => [
+      const LlmChatPromptState(),
+      const LlmChatPromptState(isInitializing: true),
+      const LlmChatPromptState(isSpeechAvailable: true),
+      const LlmChatPromptState(
+        isSpeechAvailable: true,
+        isListening: true,
+        soundLevel: 0,
+      ),
+    ],
+    verify: (_) {
+      verify(
+        () => speechToText.initialize(
+          onError: any(named: 'onError'),
+          onStatus: any(named: 'onStatus'),
+        ),
+      ).called(1);
+    },
+  );
 
   blocTest<LlmChatPromptBloc, LlmChatPromptState>(
     'marks speech available after initialization',

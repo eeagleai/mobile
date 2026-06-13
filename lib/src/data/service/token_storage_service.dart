@@ -7,6 +7,7 @@ class TokenStorageService {
       : _secureStorage = secureStorage ??
             const FlutterSecureStorage(
               aOptions: AndroidOptions(encryptedSharedPreferences: true),
+              mOptions: MacOsOptions(),
             );
 
   static const _accessTokenKey = 'access_token';

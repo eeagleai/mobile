@@ -28,5 +28,9 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Eeagle needs microphone access so you can dictate chat messages.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Eeagle uses speech recognition to turn your voice into chat text.</string>
 </dict>
 </plist>

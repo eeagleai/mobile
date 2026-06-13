@@ -12,11 +12,17 @@ part of 'llm_chat_session_bloc.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$LlmChatSessionEvent {
+mixin _$LlmChatSessionEvent implements DiagnosticableTreeMixin {
 
 
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatSessionEvent'))
+    ;
+}
 
 @override
 bool operator ==(Object other) {
@@ -28,7 +34,7 @@ bool operator ==(Object other) {
 int get hashCode => runtimeType.hashCode;
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatSessionEvent()';
 }
 
@@ -55,14 +61,15 @@ extension LlmChatSessionEventPatterns on LlmChatSessionEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Started value)?  started,TResult Function( _MessageSent value)?  messageSent,TResult Function( _InboundEventReceived value)?  inboundEventReceived,TResult Function( _Disposed value)?  disposed,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Started value)?  started,TResult Function( _MessageSent value)?  messageSent,TResult Function( _InboundEventReceived value)?  inboundEventReceived,TResult Function( _Disposed value)?  disposed,TResult Function( _PreviewActionConsumed value)?  previewActionConsumed,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _Started() when started != null:
 return started(_that);case _MessageSent() when messageSent != null:
 return messageSent(_that);case _InboundEventReceived() when inboundEventReceived != null:
 return inboundEventReceived(_that);case _Disposed() when disposed != null:
-return disposed(_that);case _:
+return disposed(_that);case _PreviewActionConsumed() when previewActionConsumed != null:
+return previewActionConsumed(_that);case _:
   return orElse();
 
 }
@@ -80,14 +87,15 @@ return disposed(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Started value)  started,required TResult Function( _MessageSent value)  messageSent,required TResult Function( _InboundEventReceived value)  inboundEventReceived,required TResult Function( _Disposed value)  disposed,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Started value)  started,required TResult Function( _MessageSent value)  messageSent,required TResult Function( _InboundEventReceived value)  inboundEventReceived,required TResult Function( _Disposed value)  disposed,required TResult Function( _PreviewActionConsumed value)  previewActionConsumed,}){
 final _that = this;
 switch (_that) {
 case _Started():
 return started(_that);case _MessageSent():
 return messageSent(_that);case _InboundEventReceived():
 return inboundEventReceived(_that);case _Disposed():
-return disposed(_that);}
+return disposed(_that);case _PreviewActionConsumed():
+return previewActionConsumed(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -101,14 +109,15 @@ return disposed(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Started value)?  started,TResult? Function( _MessageSent value)?  messageSent,TResult? Function( _InboundEventReceived value)?  inboundEventReceived,TResult? Function( _Disposed value)?  disposed,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Started value)?  started,TResult? Function( _MessageSent value)?  messageSent,TResult? Function( _InboundEventReceived value)?  inboundEventReceived,TResult? Function( _Disposed value)?  disposed,TResult? Function( _PreviewActionConsumed value)?  previewActionConsumed,}){
 final _that = this;
 switch (_that) {
 case _Started() when started != null:
 return started(_that);case _MessageSent() when messageSent != null:
 return messageSent(_that);case _InboundEventReceived() when inboundEventReceived != null:
 return inboundEventReceived(_that);case _Disposed() when disposed != null:
-return disposed(_that);case _:
+return disposed(_that);case _PreviewActionConsumed() when previewActionConsumed != null:
+return previewActionConsumed(_that);case _:
   return null;
 
 }
@@ -125,13 +134,14 @@ return disposed(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( Site site)?  started,TResult Function( String text)?  messageSent,TResult Function( ChatInboundEvent event)?  inboundEventReceived,TResult Function()?  disposed,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( Site site)?  started,TResult Function( String text)?  messageSent,TResult Function( ChatInboundEvent event)?  inboundEventReceived,TResult Function()?  disposed,TResult Function()?  previewActionConsumed,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Started() when started != null:
 return started(_that.site);case _MessageSent() when messageSent != null:
 return messageSent(_that.text);case _InboundEventReceived() when inboundEventReceived != null:
 return inboundEventReceived(_that.event);case _Disposed() when disposed != null:
-return disposed();case _:
+return disposed();case _PreviewActionConsumed() when previewActionConsumed != null:
+return previewActionConsumed();case _:
   return orElse();
 
 }
@@ -149,13 +159,14 @@ return disposed();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( Site site)  started,required TResult Function( String text)  messageSent,required TResult Function( ChatInboundEvent event)  inboundEventReceived,required TResult Function()  disposed,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( Site site)  started,required TResult Function( String text)  messageSent,required TResult Function( ChatInboundEvent event)  inboundEventReceived,required TResult Function()  disposed,required TResult Function()  previewActionConsumed,}) {final _that = this;
 switch (_that) {
 case _Started():
 return started(_that.site);case _MessageSent():
 return messageSent(_that.text);case _InboundEventReceived():
 return inboundEventReceived(_that.event);case _Disposed():
-return disposed();}
+return disposed();case _PreviewActionConsumed():
+return previewActionConsumed();}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -169,13 +180,14 @@ return disposed();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( Site site)?  started,TResult? Function( String text)?  messageSent,TResult? Function( ChatInboundEvent event)?  inboundEventReceived,TResult? Function()?  disposed,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( Site site)?  started,TResult? Function( String text)?  messageSent,TResult? Function( ChatInboundEvent event)?  inboundEventReceived,TResult? Function()?  disposed,TResult? Function()?  previewActionConsumed,}) {final _that = this;
 switch (_that) {
 case _Started() when started != null:
 return started(_that.site);case _MessageSent() when messageSent != null:
 return messageSent(_that.text);case _InboundEventReceived() when inboundEventReceived != null:
 return inboundEventReceived(_that.event);case _Disposed() when disposed != null:
-return disposed();case _:
+return disposed();case _PreviewActionConsumed() when previewActionConsumed != null:
+return previewActionConsumed();case _:
   return null;
 
 }
@@ -186,7 +198,7 @@ return disposed();case _:
 /// @nodoc
 
 
-class _Started implements LlmChatSessionEvent {
+class _Started with DiagnosticableTreeMixin implements LlmChatSessionEvent {
   const _Started({required this.site});
   
 
@@ -199,6 +211,12 @@ class _Started implements LlmChatSessionEvent {
 _$StartedCopyWith<_Started> get copyWith => __$StartedCopyWithImpl<_Started>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatSessionEvent.started'))
+    ..add(DiagnosticsProperty('site', site));
+}
 
 @override
 bool operator ==(Object other) {
@@ -210,7 +228,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,site);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatSessionEvent.started(site: $site)';
 }
 
@@ -252,7 +270,7 @@ as Site,
 /// @nodoc
 
 
-class _MessageSent implements LlmChatSessionEvent {
+class _MessageSent with DiagnosticableTreeMixin implements LlmChatSessionEvent {
   const _MessageSent({required this.text});
   
 
@@ -265,6 +283,12 @@ class _MessageSent implements LlmChatSessionEvent {
 _$MessageSentCopyWith<_MessageSent> get copyWith => __$MessageSentCopyWithImpl<_MessageSent>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatSessionEvent.messageSent'))
+    ..add(DiagnosticsProperty('text', text));
+}
 
 @override
 bool operator ==(Object other) {
@@ -276,7 +300,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,text);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatSessionEvent.messageSent(text: $text)';
 }
 
@@ -318,7 +342,7 @@ as String,
 /// @nodoc
 
 
-class _InboundEventReceived implements LlmChatSessionEvent {
+class _InboundEventReceived with DiagnosticableTreeMixin implements LlmChatSessionEvent {
   const _InboundEventReceived(this.event);
   
 
@@ -331,6 +355,12 @@ class _InboundEventReceived implements LlmChatSessionEvent {
 _$InboundEventReceivedCopyWith<_InboundEventReceived> get copyWith => __$InboundEventReceivedCopyWithImpl<_InboundEventReceived>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatSessionEvent.inboundEventReceived'))
+    ..add(DiagnosticsProperty('event', event));
+}
 
 @override
 bool operator ==(Object other) {
@@ -342,7 +372,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,event);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatSessionEvent.inboundEventReceived(event: $event)';
 }
 
@@ -393,7 +423,7 @@ $ChatInboundEventCopyWith<$Res> get event {
 /// @nodoc
 
 
-class _Disposed implements LlmChatSessionEvent {
+class _Disposed with DiagnosticableTreeMixin implements LlmChatSessionEvent {
   const _Disposed();
   
 
@@ -401,6 +431,12 @@ class _Disposed implements LlmChatSessionEvent {
 
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatSessionEvent.disposed'))
+    ;
+}
 
 @override
 bool operator ==(Object other) {
@@ -412,7 +448,7 @@ bool operator ==(Object other) {
 int get hashCode => runtimeType.hashCode;
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatSessionEvent.disposed()';
 }
 
@@ -423,9 +459,47 @@ String toString() {
 
 
 /// @nodoc
-mixin _$LlmChatSessionState {
 
- ChatConnectionPhase get connectionPhase; List<ChatMessage> get messages; int? get quotaRemaining; String? get errorMessage;
+
+class _PreviewActionConsumed with DiagnosticableTreeMixin implements LlmChatSessionEvent {
+  const _PreviewActionConsumed();
+  
+
+
+
+
+
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatSessionEvent.previewActionConsumed'))
+    ;
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PreviewActionConsumed);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
+  return 'LlmChatSessionEvent.previewActionConsumed()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+mixin _$LlmChatSessionState implements DiagnosticableTreeMixin {
+
+ ChatConnectionPhase get connectionPhase; List<ChatMessage> get messages; int? get quotaRemaining; String? get errorMessage; SitePreviewAction? get previewAction;
 /// Create a copy of LlmChatSessionState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -433,19 +507,25 @@ mixin _$LlmChatSessionState {
 $LlmChatSessionStateCopyWith<LlmChatSessionState> get copyWith => _$LlmChatSessionStateCopyWithImpl<LlmChatSessionState>(this as LlmChatSessionState, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatSessionState'))
+    ..add(DiagnosticsProperty('connectionPhase', connectionPhase))..add(DiagnosticsProperty('messages', messages))..add(DiagnosticsProperty('quotaRemaining', quotaRemaining))..add(DiagnosticsProperty('errorMessage', errorMessage))..add(DiagnosticsProperty('previewAction', previewAction));
+}
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LlmChatSessionState&&(identical(other.connectionPhase, connectionPhase) || other.connectionPhase == connectionPhase)&&const DeepCollectionEquality().equals(other.messages, messages)&&(identical(other.quotaRemaining, quotaRemaining) || other.quotaRemaining == quotaRemaining)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LlmChatSessionState&&(identical(other.connectionPhase, connectionPhase) || other.connectionPhase == connectionPhase)&&const DeepCollectionEquality().equals(other.messages, messages)&&(identical(other.quotaRemaining, quotaRemaining) || other.quotaRemaining == quotaRemaining)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.previewAction, previewAction) || other.previewAction == previewAction));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,connectionPhase,const DeepCollectionEquality().hash(messages),quotaRemaining,errorMessage);
+int get hashCode => Object.hash(runtimeType,connectionPhase,const DeepCollectionEquality().hash(messages),quotaRemaining,errorMessage,previewAction);
 
 @override
-String toString() {
-  return 'LlmChatSessionState(connectionPhase: $connectionPhase, messages: $messages, quotaRemaining: $quotaRemaining, errorMessage: $errorMessage)';
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
+  return 'LlmChatSessionState(connectionPhase: $connectionPhase, messages: $messages, quotaRemaining: $quotaRemaining, errorMessage: $errorMessage, previewAction: $previewAction)';
 }
 
 
@@ -456,11 +536,11 @@ abstract mixin class $LlmChatSessionStateCopyWith<$Res>  {
   factory $LlmChatSessionStateCopyWith(LlmChatSessionState value, $Res Function(LlmChatSessionState) _then) = _$LlmChatSessionStateCopyWithImpl;
 @useResult
 $Res call({
- ChatConnectionPhase connectionPhase, List<ChatMessage> messages, int? quotaRemaining, String? errorMessage
+ ChatConnectionPhase connectionPhase, List<ChatMessage> messages, int? quotaRemaining, String? errorMessage, SitePreviewAction? previewAction
 });
 
 
-
+$SitePreviewActionCopyWith<$Res>? get previewAction;
 
 }
 /// @nodoc
@@ -473,16 +553,29 @@ class _$LlmChatSessionStateCopyWithImpl<$Res>
 
 /// Create a copy of LlmChatSessionState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? connectionPhase = null,Object? messages = null,Object? quotaRemaining = freezed,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? connectionPhase = null,Object? messages = null,Object? quotaRemaining = freezed,Object? errorMessage = freezed,Object? previewAction = freezed,}) {
   return _then(_self.copyWith(
 connectionPhase: null == connectionPhase ? _self.connectionPhase : connectionPhase // ignore: cast_nullable_to_non_nullable
 as ChatConnectionPhase,messages: null == messages ? _self.messages : messages // ignore: cast_nullable_to_non_nullable
 as List<ChatMessage>,quotaRemaining: freezed == quotaRemaining ? _self.quotaRemaining : quotaRemaining // ignore: cast_nullable_to_non_nullable
 as int?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,previewAction: freezed == previewAction ? _self.previewAction : previewAction // ignore: cast_nullable_to_non_nullable
+as SitePreviewAction?,
   ));
 }
+/// Create a copy of LlmChatSessionState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SitePreviewActionCopyWith<$Res>? get previewAction {
+    if (_self.previewAction == null) {
+    return null;
+  }
 
+  return $SitePreviewActionCopyWith<$Res>(_self.previewAction!, (value) {
+    return _then(_self.copyWith(previewAction: value));
+  });
+}
 }
 
 
@@ -561,10 +654,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ChatConnectionPhase connectionPhase,  List<ChatMessage> messages,  int? quotaRemaining,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ChatConnectionPhase connectionPhase,  List<ChatMessage> messages,  int? quotaRemaining,  String? errorMessage,  SitePreviewAction? previewAction)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LlmChatSessionState() when $default != null:
-return $default(_that.connectionPhase,_that.messages,_that.quotaRemaining,_that.errorMessage);case _:
+return $default(_that.connectionPhase,_that.messages,_that.quotaRemaining,_that.errorMessage,_that.previewAction);case _:
   return orElse();
 
 }
@@ -582,10 +675,10 @@ return $default(_that.connectionPhase,_that.messages,_that.quotaRemaining,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ChatConnectionPhase connectionPhase,  List<ChatMessage> messages,  int? quotaRemaining,  String? errorMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ChatConnectionPhase connectionPhase,  List<ChatMessage> messages,  int? quotaRemaining,  String? errorMessage,  SitePreviewAction? previewAction)  $default,) {final _that = this;
 switch (_that) {
 case _LlmChatSessionState():
-return $default(_that.connectionPhase,_that.messages,_that.quotaRemaining,_that.errorMessage);}
+return $default(_that.connectionPhase,_that.messages,_that.quotaRemaining,_that.errorMessage,_that.previewAction);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -599,10 +692,10 @@ return $default(_that.connectionPhase,_that.messages,_that.quotaRemaining,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ChatConnectionPhase connectionPhase,  List<ChatMessage> messages,  int? quotaRemaining,  String? errorMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ChatConnectionPhase connectionPhase,  List<ChatMessage> messages,  int? quotaRemaining,  String? errorMessage,  SitePreviewAction? previewAction)?  $default,) {final _that = this;
 switch (_that) {
 case _LlmChatSessionState() when $default != null:
-return $default(_that.connectionPhase,_that.messages,_that.quotaRemaining,_that.errorMessage);case _:
+return $default(_that.connectionPhase,_that.messages,_that.quotaRemaining,_that.errorMessage,_that.previewAction);case _:
   return null;
 
 }
@@ -613,8 +706,8 @@ return $default(_that.connectionPhase,_that.messages,_that.quotaRemaining,_that.
 /// @nodoc
 
 
-class _LlmChatSessionState implements LlmChatSessionState {
-  const _LlmChatSessionState({this.connectionPhase = ChatConnectionPhase.connecting, final  List<ChatMessage> messages = const [], this.quotaRemaining, this.errorMessage}): _messages = messages;
+class _LlmChatSessionState with DiagnosticableTreeMixin implements LlmChatSessionState {
+  const _LlmChatSessionState({this.connectionPhase = ChatConnectionPhase.connecting, final  List<ChatMessage> messages = const [], this.quotaRemaining, this.errorMessage, this.previewAction}): _messages = messages;
   
 
 @override@JsonKey() final  ChatConnectionPhase connectionPhase;
@@ -627,6 +720,7 @@ class _LlmChatSessionState implements LlmChatSessionState {
 
 @override final  int? quotaRemaining;
 @override final  String? errorMessage;
+@override final  SitePreviewAction? previewAction;
 
 /// Create a copy of LlmChatSessionState
 /// with the given fields replaced by the non-null parameter values.
@@ -635,19 +729,25 @@ class _LlmChatSessionState implements LlmChatSessionState {
 _$LlmChatSessionStateCopyWith<_LlmChatSessionState> get copyWith => __$LlmChatSessionStateCopyWithImpl<_LlmChatSessionState>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatSessionState'))
+    ..add(DiagnosticsProperty('connectionPhase', connectionPhase))..add(DiagnosticsProperty('messages', messages))..add(DiagnosticsProperty('quotaRemaining', quotaRemaining))..add(DiagnosticsProperty('errorMessage', errorMessage))..add(DiagnosticsProperty('previewAction', previewAction));
+}
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LlmChatSessionState&&(identical(other.connectionPhase, connectionPhase) || other.connectionPhase == connectionPhase)&&const DeepCollectionEquality().equals(other._messages, _messages)&&(identical(other.quotaRemaining, quotaRemaining) || other.quotaRemaining == quotaRemaining)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LlmChatSessionState&&(identical(other.connectionPhase, connectionPhase) || other.connectionPhase == connectionPhase)&&const DeepCollectionEquality().equals(other._messages, _messages)&&(identical(other.quotaRemaining, quotaRemaining) || other.quotaRemaining == quotaRemaining)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.previewAction, previewAction) || other.previewAction == previewAction));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,connectionPhase,const DeepCollectionEquality().hash(_messages),quotaRemaining,errorMessage);
+int get hashCode => Object.hash(runtimeType,connectionPhase,const DeepCollectionEquality().hash(_messages),quotaRemaining,errorMessage,previewAction);
 
 @override
-String toString() {
-  return 'LlmChatSessionState(connectionPhase: $connectionPhase, messages: $messages, quotaRemaining: $quotaRemaining, errorMessage: $errorMessage)';
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
+  return 'LlmChatSessionState(connectionPhase: $connectionPhase, messages: $messages, quotaRemaining: $quotaRemaining, errorMessage: $errorMessage, previewAction: $previewAction)';
 }
 
 
@@ -658,11 +758,11 @@ abstract mixin class _$LlmChatSessionStateCopyWith<$Res> implements $LlmChatSess
   factory _$LlmChatSessionStateCopyWith(_LlmChatSessionState value, $Res Function(_LlmChatSessionState) _then) = __$LlmChatSessionStateCopyWithImpl;
 @override @useResult
 $Res call({
- ChatConnectionPhase connectionPhase, List<ChatMessage> messages, int? quotaRemaining, String? errorMessage
+ ChatConnectionPhase connectionPhase, List<ChatMessage> messages, int? quotaRemaining, String? errorMessage, SitePreviewAction? previewAction
 });
 
 
-
+@override $SitePreviewActionCopyWith<$Res>? get previewAction;
 
 }
 /// @nodoc
@@ -675,17 +775,30 @@ class __$LlmChatSessionStateCopyWithImpl<$Res>
 
 /// Create a copy of LlmChatSessionState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? connectionPhase = null,Object? messages = null,Object? quotaRemaining = freezed,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? connectionPhase = null,Object? messages = null,Object? quotaRemaining = freezed,Object? errorMessage = freezed,Object? previewAction = freezed,}) {
   return _then(_LlmChatSessionState(
 connectionPhase: null == connectionPhase ? _self.connectionPhase : connectionPhase // ignore: cast_nullable_to_non_nullable
 as ChatConnectionPhase,messages: null == messages ? _self._messages : messages // ignore: cast_nullable_to_non_nullable
 as List<ChatMessage>,quotaRemaining: freezed == quotaRemaining ? _self.quotaRemaining : quotaRemaining // ignore: cast_nullable_to_non_nullable
 as int?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,previewAction: freezed == previewAction ? _self.previewAction : previewAction // ignore: cast_nullable_to_non_nullable
+as SitePreviewAction?,
   ));
 }
 
+/// Create a copy of LlmChatSessionState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SitePreviewActionCopyWith<$Res>? get previewAction {
+    if (_self.previewAction == null) {
+    return null;
+  }
 
+  return $SitePreviewActionCopyWith<$Res>(_self.previewAction!, (value) {
+    return _then(_self.copyWith(previewAction: value));
+  });
+}
 }
 
 // dart format on

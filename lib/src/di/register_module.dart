@@ -18,6 +18,7 @@ import 'package:eeagle_ai/src/domain/use_case/increment_counter_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/login_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/logout_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/mint_chat_token_use_case.dart';
+import 'package:eeagle_ai/src/domain/use_case/resolve_message_page_paths_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/restore_session_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/send_chat_message_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/watch_chat_inbound_events_use_case.dart';
@@ -62,7 +63,14 @@ abstract class RegisterModule {
   SitesRepository sitesRepository(Dio dio) => SitesRepositoryImpl(dio);
 
   @factoryMethod
-  LlmChatSessionBloc llmChatSessionBloc(Dio dio) {
+  ResolveMessagePagePathsUseCase resolveMessagePagePathsUseCase() =>
+      ResolveMessagePagePathsUseCase();
+
+  @factoryMethod
+  LlmChatSessionBloc llmChatSessionBloc(
+    Dio dio,
+    ResolveMessagePagePathsUseCase resolveMessagePagePathsUseCase,
+  ) {
     final chatRepository = ChatRepositoryImpl(dio);
 
     return LlmChatSessionBloc(
@@ -71,6 +79,7 @@ abstract class RegisterModule {
       SendChatMessageUseCase(chatRepository),
       DisconnectChatSessionUseCase(chatRepository),
       WatchChatInboundEventsUseCase(chatRepository),
+      resolveMessagePagePathsUseCase,
     );
   }
 

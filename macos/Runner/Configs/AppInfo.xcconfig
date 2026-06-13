@@ -10,5 +10,8 @@ PRODUCT_NAME = eeagle_ai
 // The application's bundle identifier
 PRODUCT_BUNDLE_IDENTIFIER = com.example.eeagleAi
 
+// Required for Keychain entitlements (flutter_secure_storage). Change if using a different Apple team.
+DEVELOPMENT_TEAM = VA28AR9KL2
+
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 com.example. All rights reserved.

@@ -1,4 +1,5 @@
 import 'package:eeagle_ai/src/domain/model/site.dart';
+import 'package:eeagle_ai/src/presentation/home/widgets/home_site_preview_sheet.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/bloc/llm_chat_session_bloc.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/widgets/llm_chat_intro_view.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/widgets/llm_chat_message_list.dart';
@@ -28,7 +29,16 @@ class LlmChatConversationBody extends StatelessWidget {
         return Column(
           children: [
             Expanded(
-              child: LlmChatMessageList(messages: state.messages),
+              child: LlmChatMessageList(
+                messages: state.messages,
+                onPageLinkTap: (previewUrl) {
+                  showSitePreviewSheet(
+                    context,
+                    site: site,
+                    previewUrl: previewUrl,
+                  );
+                },
+              ),
             ),
             if (shouldShowProcessingIndicator(state.connectionPhase))
               const LlmChatProcessingIndicator(),

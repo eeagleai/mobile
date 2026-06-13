@@ -8,9 +8,11 @@ import 'package:eeagle_ai/src/domain/model/chat_inbound_event.dart';
 import 'package:eeagle_ai/src/domain/model/chat_message.dart';
 import 'package:eeagle_ai/src/domain/model/chat_session.dart';
 import 'package:eeagle_ai/src/domain/model/site.dart';
+import 'package:eeagle_ai/src/domain/model/site_preview_action.dart';
 import 'package:eeagle_ai/src/domain/use_case/connect_chat_session_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/disconnect_chat_session_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/mint_chat_token_use_case.dart';
+import 'package:eeagle_ai/src/domain/use_case/resolve_message_page_paths_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/send_chat_message_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/watch_chat_inbound_events_use_case.dart';
 import 'package:flutter/foundation.dart';
@@ -31,10 +33,12 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
     this._sendChatMessage,
     this._disconnectChatSession,
     this._watchChatInboundEvents,
+    this._resolveMessagePagePaths,
   ) : super(const LlmChatSessionState()) {
     on<_Started>(_onStarted);
     on<_MessageSent>(_onMessageSent);
     on<_InboundEventReceived>(_onInboundEventReceived);
+    on<_PreviewActionConsumed>(_onPreviewActionConsumed);
     on<_Disposed>(_onDisposed);
   }
 
@@ -43,11 +47,14 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
   final SendChatMessageUseCase _sendChatMessage;
   final DisconnectChatSessionUseCase _disconnectChatSession;
   final WatchChatInboundEventsUseCase _watchChatInboundEvents;
+  final ResolveMessagePagePathsUseCase _resolveMessagePagePaths;
 
   StreamSubscription<ChatInboundEvent>? _inboundSubscription;
   Site? _site;
   ChatSession? _session;
   int _messageCounter = 0;
+  final List<String> _pendingPageUrls = [];
+  bool _isChatConnected = false;
 
   Future<void> _onStarted(_Started event, Emitter<LlmChatSessionState> emit) async {
     _site = event.site;
@@ -62,13 +69,13 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
     await _connect(emit, newChat: true);
   }
 
-  Future<void> _connect(
+  Future<bool> _connect(
     Emitter<LlmChatSessionState> emit, {
     required bool newChat,
   }) async {
     final site = _site;
     if (site == null) {
-      return;
+      return false;
     }
 
     final pageUrl = normalizePageUrl(site.host);
@@ -81,11 +88,14 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
     ).run();
 
     if (isClosed || emit.isDone) {
-      return;
+      return false;
     }
+
+    var connected = false;
 
     await tokenResult.match(
       (failure) async {
+        _isChatConnected = false;
         emit(
           state.copyWith(
             connectionPhase: ChatConnectionPhase.error,
@@ -107,13 +117,18 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
         }
 
         connectResult.match(
-          (failure) => emit(
-            state.copyWith(
-              connectionPhase: ChatConnectionPhase.error,
-              errorMessage: failure.message,
-            ),
-          ),
+          (failure) {
+            _isChatConnected = false;
+            emit(
+              state.copyWith(
+                connectionPhase: ChatConnectionPhase.error,
+                errorMessage: failure.message,
+              ),
+            );
+          },
           (_) {
+            _isChatConnected = true;
+            connected = true;
             emit(
               state.copyWith(
                 connectionPhase: ChatConnectionPhase.connected,
@@ -125,6 +140,8 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
         );
       },
     );
+
+    return connected;
   }
 
   Future<void> _startInboundListener() async {
@@ -157,6 +174,8 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
       return;
     }
 
+    _pendingPageUrls.clear();
+
     final userMessage = ChatMessage(
       id: _nextMessageId(),
       role: ChatMessageRole.user,
@@ -166,6 +185,24 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
     emit(
       state.copyWith(
         messages: [...state.messages, userMessage],
+        connectionPhase: ChatConnectionPhase.idle,
+        errorMessage: null,
+        previewAction: null,
+      ),
+    );
+
+    if (!_isChatConnected) {
+      final reconnected = await _connect(emit, newChat: false);
+      if (isClosed || emit.isDone) {
+        return;
+      }
+      if (!reconnected) {
+        return;
+      }
+    }
+
+    emit(
+      state.copyWith(
         connectionPhase: ChatConnectionPhase.processing,
         errorMessage: null,
       ),
@@ -181,12 +218,15 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
     }
 
     result.match(
-      (failure) => emit(
-        state.copyWith(
-          connectionPhase: ChatConnectionPhase.error,
-          errorMessage: failure.message,
-        ),
-      ),
+      (failure) {
+        _isChatConnected = false;
+        emit(
+          state.copyWith(
+            connectionPhase: ChatConnectionPhase.idle,
+            errorMessage: failure.message,
+          ),
+        );
+      },
       (_) {},
     );
   }
@@ -205,10 +245,15 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
             errorMessage: null,
           ),
         );
-      case ChatInboundMessageEvent(:final role, :final content):
+      case ChatInboundMessageEvent(
+        :final role,
+        :final content,
+        :final pageUrls,
+      ):
         if (content.isEmpty) {
           return;
         }
+        _mergePendingPageUrls(pageUrls);
         emit(
           state.copyWith(
             messages: _mergeInboundMessage(role, content),
@@ -216,12 +261,17 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
           ),
         );
       case ChatInboundAssistantFinishedEvent():
-        final finishedMessages = _finishAssistantTurn();
+        final finishedMessages = _enrichAssistantMessageLinks(
+          _finishAssistantTurn(),
+        );
+        final previewAction = _buildPreviewAction();
+        _pendingPageUrls.clear();
         _logFinishedAssistantMessage(finishedMessages);
         emit(
           state.copyWith(
             messages: finishedMessages,
             connectionPhase: ChatConnectionPhase.idle,
+            previewAction: previewAction,
           ),
         );
       case ChatInboundErrorEvent(:final error, :final detail):
@@ -241,9 +291,61 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
         if (_site != null && !isClosed && shouldReconnect) {
           _reconnectAfterError(emit);
         }
+      case ChatInboundConnectionLostEvent():
+        _isChatConnected = false;
+        emit(
+          state.copyWith(
+            connectionPhase: ChatConnectionPhase.idle,
+          ),
+        );
       case ChatInboundPongEvent():
         break;
     }
+  }
+
+  void _onPreviewActionConsumed(
+    _PreviewActionConsumed event,
+    Emitter<LlmChatSessionState> emit,
+  ) {
+    emit(state.copyWith(previewAction: null));
+  }
+
+  void _mergePendingPageUrls(List<String> pageUrls) {
+    for (final pageUrl in pageUrls) {
+      if (!_pendingPageUrls.contains(pageUrl)) {
+        _pendingPageUrls.add(pageUrl);
+      }
+    }
+  }
+
+  List<String> _resolvedPendingPageUrls() {
+    final host = _site?.host;
+    if (host == null) {
+      return List.unmodifiable(_pendingPageUrls);
+    }
+
+    final resolvedPageUrls = <String>[];
+    for (final pageUrl in _pendingPageUrls) {
+      final resolvedPageUrl = resolveSitePageUrl(host, pageUrl);
+      if (!resolvedPageUrls.contains(resolvedPageUrl)) {
+        resolvedPageUrls.add(resolvedPageUrl);
+      }
+    }
+
+    return resolvedPageUrls;
+  }
+
+  SitePreviewAction? _buildPreviewAction() {
+    final pageUrls = _resolvedPendingPageUrls();
+    if (pageUrls.isEmpty) {
+      return null;
+    }
+
+    if (pageUrls.length == 1) {
+      return SitePreviewAction.open(url: pageUrls.first);
+    }
+
+    return SitePreviewAction.choose(urls: pageUrls);
   }
 
   String _formatInboundError(String error, String? detail) {
@@ -359,6 +461,33 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
     return messages;
   }
 
+  List<ChatMessage> _enrichAssistantMessageLinks(List<ChatMessage> messages) {
+    final siteHost = _site?.host;
+    if (messages.isEmpty || siteHost == null) {
+      return messages;
+    }
+
+    final lastMessageIndex = messages.length - 1;
+    final lastMessage = messages[lastMessageIndex];
+    if (lastMessage.role != ChatMessageRole.assistant) {
+      return messages;
+    }
+
+    final clickablePageLinks = _resolveMessagePagePaths(
+      siteHost: siteHost,
+      messageContent: lastMessage.content,
+    );
+    if (clickablePageLinks.isEmpty) {
+      return messages;
+    }
+
+    final enrichedMessages = [...messages];
+    enrichedMessages[lastMessageIndex] = lastMessage.copyWith(
+      clickablePageLinks: clickablePageLinks,
+    );
+    return enrichedMessages;
+  }
+
   void _logFinishedAssistantMessage(List<ChatMessage> messages) {
     if (!kDebugMode || messages.isEmpty) {
       return;
@@ -428,6 +557,7 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
     _Disposed event,
     Emitter<LlmChatSessionState> emit,
   ) async {
+    _isChatConnected = false;
     await _inboundSubscription?.cancel();
     _inboundSubscription = null;
     await _disconnectChatSession().run();

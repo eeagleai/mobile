@@ -15,9 +15,10 @@ final Set<Factory<OneSequenceGestureRecognizer>> _webViewGestureRecognizers = {
   Factory<EagerGestureRecognizer>(() => EagerGestureRecognizer()),
 };
 
-Future<void> showHomeSitePreviewSheet(
+Future<void> showSitePreviewSheet(
   BuildContext context, {
   required Site site,
+  String? previewUrl,
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -37,6 +38,7 @@ Future<void> showHomeSitePreviewSheet(
         builder: (context, scrollController) {
           return _HomeSitePreviewSheet(
             site: site,
+            previewUrl: previewUrl,
             scrollController: scrollController,
           );
         },
@@ -45,13 +47,36 @@ Future<void> showHomeSitePreviewSheet(
   );
 }
 
+Future<void> showHomeSitePreviewSheet(
+  BuildContext context, {
+  required Site site,
+}) {
+  return showSitePreviewSheet(context, site: site);
+}
+
+String previewSheetSubtitle(String pageUrl) {
+  final uri = Uri.tryParse(pageUrl);
+  if (uri == null) {
+    return pageUrl;
+  }
+
+  final path = uri.path;
+  if (path.isEmpty || path == '/') {
+    return uri.host;
+  }
+
+  return path;
+}
+
 class _HomeSitePreviewSheet extends StatefulWidget {
   const _HomeSitePreviewSheet({
     required this.site,
     required this.scrollController,
+    this.previewUrl,
   });
 
   final Site site;
+  final String? previewUrl;
   final ScrollController scrollController;
 
   @override
@@ -65,7 +90,7 @@ class _HomeSitePreviewSheetState extends State<_HomeSitePreviewSheet> {
   @override
   void initState() {
     super.initState();
-    final pageUrl = normalizePageUrl(widget.site.host);
+    final pageUrl = widget.previewUrl ?? normalizePageUrl(widget.site.host);
 
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -97,6 +122,8 @@ class _HomeSitePreviewSheetState extends State<_HomeSitePreviewSheet> {
   @override
   Widget build(BuildContext context) {
     final colors = EeagleTheme.of(context).colors;
+    final pageUrl = widget.previewUrl ?? normalizePageUrl(widget.site.host);
+    final subtitle = previewSheetSubtitle(pageUrl);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -145,7 +172,7 @@ class _HomeSitePreviewSheetState extends State<_HomeSitePreviewSheet> {
                                   ),
                                   const SizedBox(height: 2),
                                   EeagleText(
-                                    widget.site.host,
+                                    subtitle,
                                     style: EeagleTextStyles.bodySmall,
                                     textColor: colors.foregroundSecondary,
                                     maxLines: 1,

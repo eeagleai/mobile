@@ -7,5 +7,6 @@ sealed class LlmChatSessionState with _$LlmChatSessionState {
     @Default([]) List<ChatMessage> messages,
     int? quotaRemaining,
     String? errorMessage,
+    SitePreviewAction? previewAction,
   }) = _LlmChatSessionState;
 }

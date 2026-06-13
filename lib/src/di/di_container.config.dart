@@ -24,6 +24,7 @@ import '../domain/use_case/get_sites_use_case.dart' as _i178;
 import '../domain/use_case/increment_counter_use_case.dart' as _i252;
 import '../domain/use_case/login_use_case.dart' as _i772;
 import '../domain/use_case/logout_use_case.dart' as _i235;
+import '../domain/use_case/resolve_message_page_paths_use_case.dart' as _i673;
 import '../domain/use_case/restore_session_use_case.dart' as _i8;
 import '../presentation/home/bloc/home_bloc.dart' as _i355;
 import '../presentation/home/bloc/sites_bloc.dart' as _i797;
@@ -41,6 +42,9 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerModule = _$RegisterModule();
+    gh.factory<_i673.ResolveMessagePagePathsUseCase>(
+      () => registerModule.resolveMessagePagePathsUseCase(),
+    );
     gh.factory<_i795.SpeechToTextService>(
       () => registerModule.speechToTextService(),
     );
@@ -65,6 +69,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i721.TokenStorageService>(),
       ),
     );
+    gh.factory<_i937.LlmChatSessionBloc>(
+      () => registerModule.llmChatSessionBloc(
+        gh<_i361.Dio>(),
+        gh<_i673.ResolveMessagePagePathsUseCase>(),
+      ),
+    );
     gh.lazySingleton<_i306.AuthRepository>(
       () => registerModule.authRepository(
         gh<_i361.Dio>(),
@@ -77,9 +87,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i440.SitesRepository>(
       () => registerModule.sitesRepository(gh<_i361.Dio>()),
-    );
-    gh.factory<_i937.LlmChatSessionBloc>(
-      () => registerModule.llmChatSessionBloc(gh<_i361.Dio>()),
     );
     gh.factory<_i772.LoginUseCase>(
       () => registerModule.loginUseCase(gh<_i306.AuthRepository>()),

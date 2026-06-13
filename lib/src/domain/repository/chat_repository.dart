@@ -27,4 +27,6 @@ abstract class ChatRepository {
   TaskEither<OperationFailure, Unit> disconnectSession();
 
   Stream<ChatInboundEvent> watchInboundEvents();
+
+  bool get isSessionConnected;
 }
