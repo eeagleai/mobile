@@ -1,4 +1,5 @@
 import 'package:eeagle_ai/src/domain/model/chat_message.dart';
+import 'package:eeagle_ai/src/presentation/llm_chat/widgets/llm_chat_message_content.dart';
 import 'package:eeagle_ai/src/presentation/ui/theme/eeagle_theme.dart';
 import 'package:eeagle_ai/src/presentation/ui/typography/eeagle_text.dart';
 import 'package:eeagle_ai/src/presentation/ui/typography/eeagle_text_style.dart';
@@ -8,9 +9,11 @@ class LlmChatMessageBubble extends StatelessWidget {
   const LlmChatMessageBubble({
     super.key,
     required this.message,
+    required this.onPageLinkTap,
   });
 
   final ChatMessage message;
+  final ValueChanged<String> onPageLinkTap;
 
   @override
   Widget build(BuildContext context) {
@@ -41,13 +44,17 @@ class LlmChatMessageBubble extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            child: EeagleText(
-              message.content,
-              style: EeagleTextStyles.bodyMedium,
-              textColor: isUser
-                  ? colors.foregroundPrimary
-                  : colors.foregroundPrimary,
-            ),
+            child: isUser
+                ? EeagleText(
+                    message.content,
+                    style: EeagleTextStyles.bodyMedium,
+                    textColor: colors.foregroundPrimary,
+                  )
+                : LlmChatMessageContent(
+                    content: message.content,
+                    clickablePageLinks: message.clickablePageLinks,
+                    onPageLinkTap: onPageLinkTap,
+                  ),
           ),
         ),
       ),

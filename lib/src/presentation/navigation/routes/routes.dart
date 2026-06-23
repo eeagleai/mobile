@@ -1,4 +1,6 @@
 import 'package:eeagle_ai/src/domain/model/site.dart';
+import 'package:eeagle_ai/src/presentation/analytics/analytics_screen.dart';
+import 'package:eeagle_ai/src/presentation/live_conversation/live_conversation_screen.dart';
 import 'package:eeagle_ai/src/presentation/home/home_screen.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/llm_chat_screen.dart';
 import 'package:eeagle_ai/src/presentation/login/login_screen.dart';
@@ -32,6 +34,32 @@ class AppRoutes {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => LlmChatScreen(site: site),
+        );
+      case RoutesConstants.analytics:
+        final args = settings.arguments;
+        if (args is! AnalyticsScreenArgs) {
+          return MaterialPageRoute<void>(
+            settings: settings,
+            builder: (_) => const HomeScreen(),
+          );
+        }
+
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => AnalyticsScreen(args: args),
+        );
+      case RoutesConstants.liveConversation:
+        final args = settings.arguments;
+        if (args is! LiveConversationScreenArgs) {
+          return MaterialPageRoute<void>(
+            settings: settings,
+            builder: (_) => const HomeScreen(),
+          );
+        }
+
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => LiveConversationScreen(args: args),
         );
       default:
         return MaterialPageRoute<void>(

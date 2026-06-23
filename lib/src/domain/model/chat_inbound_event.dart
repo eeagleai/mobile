@@ -12,6 +12,7 @@ sealed class ChatInboundEvent with _$ChatInboundEvent {
   const factory ChatInboundEvent.message({
     required ChatMessageRole role,
     required String content,
+    @Default([]) List<String> pageUrls,
   }) = ChatInboundMessageEvent;
 
   const factory ChatInboundEvent.assistantFinished() =
@@ -23,4 +24,7 @@ sealed class ChatInboundEvent with _$ChatInboundEvent {
   }) = ChatInboundErrorEvent;
 
   const factory ChatInboundEvent.pong() = ChatInboundPongEvent;
+
+  const factory ChatInboundEvent.connectionLost() =
+      ChatInboundConnectionLostEvent;
 }

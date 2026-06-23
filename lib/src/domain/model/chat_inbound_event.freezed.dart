@@ -55,7 +55,7 @@ extension ChatInboundEventPatterns on ChatInboundEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ChatInboundStatusEvent value)?  status,TResult Function( ChatInboundMessageEvent value)?  message,TResult Function( ChatInboundAssistantFinishedEvent value)?  assistantFinished,TResult Function( ChatInboundErrorEvent value)?  error,TResult Function( ChatInboundPongEvent value)?  pong,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ChatInboundStatusEvent value)?  status,TResult Function( ChatInboundMessageEvent value)?  message,TResult Function( ChatInboundAssistantFinishedEvent value)?  assistantFinished,TResult Function( ChatInboundErrorEvent value)?  error,TResult Function( ChatInboundPongEvent value)?  pong,TResult Function( ChatInboundConnectionLostEvent value)?  connectionLost,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case ChatInboundStatusEvent() when status != null:
@@ -63,7 +63,8 @@ return status(_that);case ChatInboundMessageEvent() when message != null:
 return message(_that);case ChatInboundAssistantFinishedEvent() when assistantFinished != null:
 return assistantFinished(_that);case ChatInboundErrorEvent() when error != null:
 return error(_that);case ChatInboundPongEvent() when pong != null:
-return pong(_that);case _:
+return pong(_that);case ChatInboundConnectionLostEvent() when connectionLost != null:
+return connectionLost(_that);case _:
   return orElse();
 
 }
@@ -81,7 +82,7 @@ return pong(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ChatInboundStatusEvent value)  status,required TResult Function( ChatInboundMessageEvent value)  message,required TResult Function( ChatInboundAssistantFinishedEvent value)  assistantFinished,required TResult Function( ChatInboundErrorEvent value)  error,required TResult Function( ChatInboundPongEvent value)  pong,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ChatInboundStatusEvent value)  status,required TResult Function( ChatInboundMessageEvent value)  message,required TResult Function( ChatInboundAssistantFinishedEvent value)  assistantFinished,required TResult Function( ChatInboundErrorEvent value)  error,required TResult Function( ChatInboundPongEvent value)  pong,required TResult Function( ChatInboundConnectionLostEvent value)  connectionLost,}){
 final _that = this;
 switch (_that) {
 case ChatInboundStatusEvent():
@@ -89,7 +90,8 @@ return status(_that);case ChatInboundMessageEvent():
 return message(_that);case ChatInboundAssistantFinishedEvent():
 return assistantFinished(_that);case ChatInboundErrorEvent():
 return error(_that);case ChatInboundPongEvent():
-return pong(_that);}
+return pong(_that);case ChatInboundConnectionLostEvent():
+return connectionLost(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -103,7 +105,7 @@ return pong(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ChatInboundStatusEvent value)?  status,TResult? Function( ChatInboundMessageEvent value)?  message,TResult? Function( ChatInboundAssistantFinishedEvent value)?  assistantFinished,TResult? Function( ChatInboundErrorEvent value)?  error,TResult? Function( ChatInboundPongEvent value)?  pong,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ChatInboundStatusEvent value)?  status,TResult? Function( ChatInboundMessageEvent value)?  message,TResult? Function( ChatInboundAssistantFinishedEvent value)?  assistantFinished,TResult? Function( ChatInboundErrorEvent value)?  error,TResult? Function( ChatInboundPongEvent value)?  pong,TResult? Function( ChatInboundConnectionLostEvent value)?  connectionLost,}){
 final _that = this;
 switch (_that) {
 case ChatInboundStatusEvent() when status != null:
@@ -111,7 +113,8 @@ return status(_that);case ChatInboundMessageEvent() when message != null:
 return message(_that);case ChatInboundAssistantFinishedEvent() when assistantFinished != null:
 return assistantFinished(_that);case ChatInboundErrorEvent() when error != null:
 return error(_that);case ChatInboundPongEvent() when pong != null:
-return pong(_that);case _:
+return pong(_that);case ChatInboundConnectionLostEvent() when connectionLost != null:
+return connectionLost(_that);case _:
   return null;
 
 }
@@ -128,14 +131,15 @@ return pong(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String state)?  status,TResult Function( ChatMessageRole role,  String content)?  message,TResult Function()?  assistantFinished,TResult Function( String error,  String? detail)?  error,TResult Function()?  pong,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String state)?  status,TResult Function( ChatMessageRole role,  String content,  List<String> pageUrls)?  message,TResult Function()?  assistantFinished,TResult Function( String error,  String? detail)?  error,TResult Function()?  pong,TResult Function()?  connectionLost,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case ChatInboundStatusEvent() when status != null:
 return status(_that.state);case ChatInboundMessageEvent() when message != null:
-return message(_that.role,_that.content);case ChatInboundAssistantFinishedEvent() when assistantFinished != null:
+return message(_that.role,_that.content,_that.pageUrls);case ChatInboundAssistantFinishedEvent() when assistantFinished != null:
 return assistantFinished();case ChatInboundErrorEvent() when error != null:
 return error(_that.error,_that.detail);case ChatInboundPongEvent() when pong != null:
-return pong();case _:
+return pong();case ChatInboundConnectionLostEvent() when connectionLost != null:
+return connectionLost();case _:
   return orElse();
 
 }
@@ -153,14 +157,15 @@ return pong();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String state)  status,required TResult Function( ChatMessageRole role,  String content)  message,required TResult Function()  assistantFinished,required TResult Function( String error,  String? detail)  error,required TResult Function()  pong,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String state)  status,required TResult Function( ChatMessageRole role,  String content,  List<String> pageUrls)  message,required TResult Function()  assistantFinished,required TResult Function( String error,  String? detail)  error,required TResult Function()  pong,required TResult Function()  connectionLost,}) {final _that = this;
 switch (_that) {
 case ChatInboundStatusEvent():
 return status(_that.state);case ChatInboundMessageEvent():
-return message(_that.role,_that.content);case ChatInboundAssistantFinishedEvent():
+return message(_that.role,_that.content,_that.pageUrls);case ChatInboundAssistantFinishedEvent():
 return assistantFinished();case ChatInboundErrorEvent():
 return error(_that.error,_that.detail);case ChatInboundPongEvent():
-return pong();}
+return pong();case ChatInboundConnectionLostEvent():
+return connectionLost();}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -174,14 +179,15 @@ return pong();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String state)?  status,TResult? Function( ChatMessageRole role,  String content)?  message,TResult? Function()?  assistantFinished,TResult? Function( String error,  String? detail)?  error,TResult? Function()?  pong,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String state)?  status,TResult? Function( ChatMessageRole role,  String content,  List<String> pageUrls)?  message,TResult? Function()?  assistantFinished,TResult? Function( String error,  String? detail)?  error,TResult? Function()?  pong,TResult? Function()?  connectionLost,}) {final _that = this;
 switch (_that) {
 case ChatInboundStatusEvent() when status != null:
 return status(_that.state);case ChatInboundMessageEvent() when message != null:
-return message(_that.role,_that.content);case ChatInboundAssistantFinishedEvent() when assistantFinished != null:
+return message(_that.role,_that.content,_that.pageUrls);case ChatInboundAssistantFinishedEvent() when assistantFinished != null:
 return assistantFinished();case ChatInboundErrorEvent() when error != null:
 return error(_that.error,_that.detail);case ChatInboundPongEvent() when pong != null:
-return pong();case _:
+return pong();case ChatInboundConnectionLostEvent() when connectionLost != null:
+return connectionLost();case _:
   return null;
 
 }
@@ -259,11 +265,18 @@ as String,
 
 
 class ChatInboundMessageEvent implements ChatInboundEvent {
-  const ChatInboundMessageEvent({required this.role, required this.content});
+  const ChatInboundMessageEvent({required this.role, required this.content, final  List<String> pageUrls = const []}): _pageUrls = pageUrls;
   
 
  final  ChatMessageRole role;
  final  String content;
+ final  List<String> _pageUrls;
+@JsonKey() List<String> get pageUrls {
+  if (_pageUrls is EqualUnmodifiableListView) return _pageUrls;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_pageUrls);
+}
+
 
 /// Create a copy of ChatInboundEvent
 /// with the given fields replaced by the non-null parameter values.
@@ -275,16 +288,16 @@ $ChatInboundMessageEventCopyWith<ChatInboundMessageEvent> get copyWith => _$Chat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatInboundMessageEvent&&(identical(other.role, role) || other.role == role)&&(identical(other.content, content) || other.content == content));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatInboundMessageEvent&&(identical(other.role, role) || other.role == role)&&(identical(other.content, content) || other.content == content)&&const DeepCollectionEquality().equals(other._pageUrls, _pageUrls));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,role,content);
+int get hashCode => Object.hash(runtimeType,role,content,const DeepCollectionEquality().hash(_pageUrls));
 
 @override
 String toString() {
-  return 'ChatInboundEvent.message(role: $role, content: $content)';
+  return 'ChatInboundEvent.message(role: $role, content: $content, pageUrls: $pageUrls)';
 }
 
 
@@ -295,7 +308,7 @@ abstract mixin class $ChatInboundMessageEventCopyWith<$Res> implements $ChatInbo
   factory $ChatInboundMessageEventCopyWith(ChatInboundMessageEvent value, $Res Function(ChatInboundMessageEvent) _then) = _$ChatInboundMessageEventCopyWithImpl;
 @useResult
 $Res call({
- ChatMessageRole role, String content
+ ChatMessageRole role, String content, List<String> pageUrls
 });
 
 
@@ -312,11 +325,12 @@ class _$ChatInboundMessageEventCopyWithImpl<$Res>
 
 /// Create a copy of ChatInboundEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? role = null,Object? content = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? role = null,Object? content = null,Object? pageUrls = null,}) {
   return _then(ChatInboundMessageEvent(
 role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as ChatMessageRole,content: null == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
-as String,
+as String,pageUrls: null == pageUrls ? _self._pageUrls : pageUrls // ignore: cast_nullable_to_non_nullable
+as List<String>,
   ));
 }
 
@@ -447,6 +461,38 @@ int get hashCode => runtimeType.hashCode;
 @override
 String toString() {
   return 'ChatInboundEvent.pong()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class ChatInboundConnectionLostEvent implements ChatInboundEvent {
+  const ChatInboundConnectionLostEvent();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatInboundConnectionLostEvent);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ChatInboundEvent.connectionLost()';
 }
 
 

@@ -15,4 +15,7 @@ sealed class LlmChatSessionEvent with _$LlmChatSessionEvent {
   ) = _InboundEventReceived;
 
   const factory LlmChatSessionEvent.disposed() = _Disposed;
+
+  const factory LlmChatSessionEvent.previewActionConsumed() =
+      _PreviewActionConsumed;
 }

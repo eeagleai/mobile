@@ -63,9 +63,13 @@ ChatInboundEvent? _mapMessageFrame(Map<String, dynamic> frame) {
   }
 
   final role = frame['role'];
+  final messageRole =
+      role is String ? mapChatMessageRole(role) : ChatMessageRole.assistant;
+
   return ChatInboundEvent.message(
-    role: role is String ? mapChatMessageRole(role) : ChatMessageRole.assistant,
+    role: messageRole,
     content: content,
+    pageUrls: _pageUrlsForRole(messageRole, frame),
   );
 }
 
@@ -80,10 +84,66 @@ ChatInboundEvent? _mapStreamingChunkFrame(Map<String, dynamic> frame) {
   }
 
   final role = frame['role'];
+  final messageRole =
+      role is String ? mapChatMessageRole(role) : ChatMessageRole.assistant;
+
   return ChatInboundEvent.message(
-    role: role is String ? mapChatMessageRole(role) : ChatMessageRole.assistant,
+    role: messageRole,
     content: content,
+    pageUrls: _pageUrlsForRole(messageRole, frame),
   );
+}
+
+bool hasSiteChangePayload(Map<String, dynamic> frame) {
+  final payload = frame['payload'];
+  if (payload is! Map<String, dynamic>) {
+    return false;
+  }
+
+  return payload['delta'] == true || payload['backend_dte_delta'] == true;
+}
+
+List<String> extractPageUrls(Map<String, dynamic> frame) {
+  if (!hasSiteChangePayload(frame)) {
+    return const [];
+  }
+
+  final payload = frame['payload'];
+  if (payload is! Map<String, dynamic>) {
+    return const [];
+  }
+
+  final pageUrls = payload['page_urls'];
+  if (pageUrls is! List) {
+    return const [];
+  }
+
+  final deduped = <String>[];
+  for (final pageUrl in pageUrls) {
+    if (pageUrl is! String) {
+      continue;
+    }
+
+    final trimmed = pageUrl.trim();
+    if (trimmed.isEmpty || deduped.contains(trimmed)) {
+      continue;
+    }
+
+    deduped.add(trimmed);
+  }
+
+  return deduped;
+}
+
+List<String> _pageUrlsForRole(
+  ChatMessageRole role,
+  Map<String, dynamic> frame,
+) {
+  if (role != ChatMessageRole.assistant) {
+    return const [];
+  }
+
+  return extractPageUrls(frame);
 }
 
 /// Builds an error event, tolerating the various shapes the backend may send.

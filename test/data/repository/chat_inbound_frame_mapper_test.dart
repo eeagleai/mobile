@@ -84,6 +84,119 @@ void main() {
     expect(message.content, "I'm doing well, thanks! How can I help you today?");
   });
 
+  test('extracts single page_urls from assistant_message payload', () {
+    final event = mapChatInboundFrame({
+      'type': 'assistant_message',
+      'content': 'Created a new flowers page.',
+      'payload': {
+        'delta': true,
+        'page_urls': ['https://wedding.eeagle.ai/flowers'],
+      },
+    });
+
+    expect(event, isA<ChatInboundMessageEvent>());
+    final message = event! as ChatInboundMessageEvent;
+    expect(message.pageUrls, ['https://wedding.eeagle.ai/flowers']);
+  });
+
+  test('extracts page_urls when backend_dte_delta is true', () {
+    final event = mapChatInboundFrame({
+      'type': 'assistant_message',
+      'content': 'Updated the homepage.',
+      'payload': {
+        'backend_dte_delta': true,
+        'page_urls': ['https://wedding.eeagle.ai/'],
+      },
+    });
+
+    expect(event, isA<ChatInboundMessageEvent>());
+    final message = event! as ChatInboundMessageEvent;
+    expect(message.pageUrls, ['https://wedding.eeagle.ai/']);
+  });
+
+  test('extracts multiple page_urls and dedupes them', () {
+    final event = mapChatInboundFrame({
+      'type': 'assistant_message',
+      'content': 'Updated multiple pages.',
+      'payload': {
+        'delta': true,
+        'page_urls': [
+          'https://wedding.eeagle.ai/flowers',
+          'https://wedding.eeagle.ai/about',
+          'https://wedding.eeagle.ai/flowers',
+        ],
+      },
+    });
+
+    expect(event, isA<ChatInboundMessageEvent>());
+    final message = event! as ChatInboundMessageEvent;
+    expect(
+      message.pageUrls,
+      [
+        'https://wedding.eeagle.ai/flowers',
+        'https://wedding.eeagle.ai/about',
+      ],
+    );
+  });
+
+  test('keeps root path page_urls from payload', () {
+    final event = mapChatInboundFrame({
+      'type': 'assistant_message',
+      'content': 'Updated the homepage.',
+      'payload': {
+        'delta': true,
+        'page_urls': ['/'],
+      },
+    });
+
+    expect(event, isA<ChatInboundMessageEvent>());
+    final message = event! as ChatInboundMessageEvent;
+    expect(message.pageUrls, ['/']);
+  });
+
+  test('ignores page_urls when neither delta flag is true', () {
+    final event = mapChatInboundFrame({
+      'type': 'assistant_message',
+      'content': "I'm doing well, thanks!",
+      'payload': {
+        'delta': false,
+        'backend_dte_delta': false,
+        'page_urls': ['https://wedding.eeagle.ai/flowers'],
+      },
+    });
+
+    expect(event, isA<ChatInboundMessageEvent>());
+    final message = event! as ChatInboundMessageEvent;
+    expect(message.pageUrls, isEmpty);
+  });
+
+  test('returns empty page_urls when payload is missing', () {
+    final event = mapChatInboundFrame({
+      'type': 'assistant_message',
+      'content': 'No site changes here.',
+    });
+
+    expect(event, isA<ChatInboundMessageEvent>());
+    final message = event! as ChatInboundMessageEvent;
+    expect(message.pageUrls, isEmpty);
+  });
+
+  test('ignores page_urls on user messages', () {
+    final event = mapChatInboundFrame({
+      'type': 'message',
+      'role': 'user',
+      'content': 'Create a flowers page',
+      'payload': {
+        'delta': true,
+        'page_urls': ['https://wedding.eeagle.ai/flowers'],
+      },
+    });
+
+    expect(event, isA<ChatInboundMessageEvent>());
+    final message = event! as ChatInboundMessageEvent;
+    expect(message.pageUrls, isEmpty);
+  });
+
   test('maps error frames with object detail', () {
     final event = mapChatInboundFrame({
       'type': 'error',
