@@ -12,11 +12,17 @@ part of 'llm_chat_prompt_bloc.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$LlmChatPromptEvent {
+mixin _$LlmChatPromptEvent implements DiagnosticableTreeMixin {
 
 
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatPromptEvent'))
+    ;
+}
 
 @override
 bool operator ==(Object other) {
@@ -28,7 +34,7 @@ bool operator ==(Object other) {
 int get hashCode => runtimeType.hashCode;
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatPromptEvent()';
 }
 
@@ -228,7 +234,7 @@ return attachmentRemoved(_that.id);case _:
 /// @nodoc
 
 
-class _Initialized implements LlmChatPromptEvent {
+class _Initialized with DiagnosticableTreeMixin implements LlmChatPromptEvent {
   const _Initialized();
   
 
@@ -236,6 +242,12 @@ class _Initialized implements LlmChatPromptEvent {
 
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatPromptEvent.initialized'))
+    ;
+}
 
 @override
 bool operator ==(Object other) {
@@ -247,7 +259,7 @@ bool operator ==(Object other) {
 int get hashCode => runtimeType.hashCode;
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatPromptEvent.initialized()';
 }
 
@@ -260,7 +272,7 @@ String toString() {
 /// @nodoc
 
 
-class _MicToggled implements LlmChatPromptEvent {
+class _MicToggled with DiagnosticableTreeMixin implements LlmChatPromptEvent {
   const _MicToggled();
   
 
@@ -268,6 +280,12 @@ class _MicToggled implements LlmChatPromptEvent {
 
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatPromptEvent.micToggled'))
+    ;
+}
 
 @override
 bool operator ==(Object other) {
@@ -279,7 +297,7 @@ bool operator ==(Object other) {
 int get hashCode => runtimeType.hashCode;
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatPromptEvent.micToggled()';
 }
 
@@ -292,7 +310,7 @@ String toString() {
 /// @nodoc
 
 
-class _TextChanged implements LlmChatPromptEvent {
+class _TextChanged with DiagnosticableTreeMixin implements LlmChatPromptEvent {
   const _TextChanged(this.text);
   
 
@@ -305,6 +323,12 @@ class _TextChanged implements LlmChatPromptEvent {
 _$TextChangedCopyWith<_TextChanged> get copyWith => __$TextChangedCopyWithImpl<_TextChanged>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatPromptEvent.textChanged'))
+    ..add(DiagnosticsProperty('text', text));
+}
 
 @override
 bool operator ==(Object other) {
@@ -316,7 +340,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,text);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatPromptEvent.textChanged(text: $text)';
 }
 
@@ -358,7 +382,7 @@ as String,
 /// @nodoc
 
 
-class _SpeechResultReceived implements LlmChatPromptEvent {
+class _SpeechResultReceived with DiagnosticableTreeMixin implements LlmChatPromptEvent {
   const _SpeechResultReceived({required this.words, required this.isFinal});
   
 
@@ -372,6 +396,12 @@ class _SpeechResultReceived implements LlmChatPromptEvent {
 _$SpeechResultReceivedCopyWith<_SpeechResultReceived> get copyWith => __$SpeechResultReceivedCopyWithImpl<_SpeechResultReceived>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatPromptEvent.speechResultReceived'))
+    ..add(DiagnosticsProperty('words', words))..add(DiagnosticsProperty('isFinal', isFinal));
+}
 
 @override
 bool operator ==(Object other) {
@@ -383,7 +413,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,words,isFinal);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatPromptEvent.speechResultReceived(words: $words, isFinal: $isFinal)';
 }
 
@@ -426,7 +456,7 @@ as bool,
 /// @nodoc
 
 
-class _SpeechStatusChanged implements LlmChatPromptEvent {
+class _SpeechStatusChanged with DiagnosticableTreeMixin implements LlmChatPromptEvent {
   const _SpeechStatusChanged(this.status);
   
 
@@ -439,6 +469,12 @@ class _SpeechStatusChanged implements LlmChatPromptEvent {
 _$SpeechStatusChangedCopyWith<_SpeechStatusChanged> get copyWith => __$SpeechStatusChangedCopyWithImpl<_SpeechStatusChanged>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatPromptEvent.speechStatusChanged'))
+    ..add(DiagnosticsProperty('status', status));
+}
 
 @override
 bool operator ==(Object other) {
@@ -450,7 +486,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,status);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatPromptEvent.speechStatusChanged(status: $status)';
 }
 
@@ -492,7 +528,7 @@ as String,
 /// @nodoc
 
 
-class _SpeechErrorReceived implements LlmChatPromptEvent {
+class _SpeechErrorReceived with DiagnosticableTreeMixin implements LlmChatPromptEvent {
   const _SpeechErrorReceived(this.message);
   
 
@@ -505,6 +541,12 @@ class _SpeechErrorReceived implements LlmChatPromptEvent {
 _$SpeechErrorReceivedCopyWith<_SpeechErrorReceived> get copyWith => __$SpeechErrorReceivedCopyWithImpl<_SpeechErrorReceived>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatPromptEvent.speechErrorReceived'))
+    ..add(DiagnosticsProperty('message', message));
+}
 
 @override
 bool operator ==(Object other) {
@@ -516,7 +558,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,message);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatPromptEvent.speechErrorReceived(message: $message)';
 }
 
@@ -558,7 +600,7 @@ as String,
 /// @nodoc
 
 
-class _SendRequested implements LlmChatPromptEvent {
+class _SendRequested with DiagnosticableTreeMixin implements LlmChatPromptEvent {
   const _SendRequested();
   
 
@@ -566,6 +608,12 @@ class _SendRequested implements LlmChatPromptEvent {
 
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatPromptEvent.sendRequested'))
+    ;
+}
 
 @override
 bool operator ==(Object other) {
@@ -577,7 +625,7 @@ bool operator ==(Object other) {
 int get hashCode => runtimeType.hashCode;
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatPromptEvent.sendRequested()';
 }
 
@@ -590,7 +638,7 @@ String toString() {
 /// @nodoc
 
 
-class _SoundLevelChanged implements LlmChatPromptEvent {
+class _SoundLevelChanged with DiagnosticableTreeMixin implements LlmChatPromptEvent {
   const _SoundLevelChanged(this.level);
   
 
@@ -603,6 +651,12 @@ class _SoundLevelChanged implements LlmChatPromptEvent {
 _$SoundLevelChangedCopyWith<_SoundLevelChanged> get copyWith => __$SoundLevelChangedCopyWithImpl<_SoundLevelChanged>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatPromptEvent.soundLevelChanged'))
+    ..add(DiagnosticsProperty('level', level));
+}
 
 @override
 bool operator ==(Object other) {
@@ -614,7 +668,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,level);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatPromptEvent.soundLevelChanged(level: $level)';
 }
 
@@ -656,7 +710,7 @@ as double,
 /// @nodoc
 
 
-class _PickMediaRequested implements LlmChatPromptEvent {
+class _PickMediaRequested with DiagnosticableTreeMixin implements LlmChatPromptEvent {
   const _PickMediaRequested();
   
 
@@ -664,6 +718,12 @@ class _PickMediaRequested implements LlmChatPromptEvent {
 
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatPromptEvent.pickMediaRequested'))
+    ;
+}
 
 @override
 bool operator ==(Object other) {
@@ -675,7 +735,7 @@ bool operator ==(Object other) {
 int get hashCode => runtimeType.hashCode;
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatPromptEvent.pickMediaRequested()';
 }
 
@@ -688,7 +748,7 @@ String toString() {
 /// @nodoc
 
 
-class _PickFilesRequested implements LlmChatPromptEvent {
+class _PickFilesRequested with DiagnosticableTreeMixin implements LlmChatPromptEvent {
   const _PickFilesRequested();
   
 
@@ -696,6 +756,12 @@ class _PickFilesRequested implements LlmChatPromptEvent {
 
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatPromptEvent.pickFilesRequested'))
+    ;
+}
 
 @override
 bool operator ==(Object other) {
@@ -707,7 +773,7 @@ bool operator ==(Object other) {
 int get hashCode => runtimeType.hashCode;
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatPromptEvent.pickFilesRequested()';
 }
 
@@ -720,7 +786,7 @@ String toString() {
 /// @nodoc
 
 
-class _AttachmentRemoved implements LlmChatPromptEvent {
+class _AttachmentRemoved with DiagnosticableTreeMixin implements LlmChatPromptEvent {
   const _AttachmentRemoved(this.id);
   
 
@@ -733,6 +799,12 @@ class _AttachmentRemoved implements LlmChatPromptEvent {
 _$AttachmentRemovedCopyWith<_AttachmentRemoved> get copyWith => __$AttachmentRemovedCopyWithImpl<_AttachmentRemoved>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatPromptEvent.attachmentRemoved'))
+    ..add(DiagnosticsProperty('id', id));
+}
 
 @override
 bool operator ==(Object other) {
@@ -744,7 +816,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,id);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatPromptEvent.attachmentRemoved(id: $id)';
 }
 
@@ -784,7 +856,7 @@ as String,
 }
 
 /// @nodoc
-mixin _$LlmChatPromptState {
+mixin _$LlmChatPromptState implements DiagnosticableTreeMixin {
 
  String get promptText; bool get isListening; bool get isInitializing; bool get isSpeechAvailable; double get soundLevel; List<PromptAttachment> get attachments; String? get errorMessage;
 /// Create a copy of LlmChatPromptState
@@ -794,6 +866,12 @@ mixin _$LlmChatPromptState {
 $LlmChatPromptStateCopyWith<LlmChatPromptState> get copyWith => _$LlmChatPromptStateCopyWithImpl<LlmChatPromptState>(this as LlmChatPromptState, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatPromptState'))
+    ..add(DiagnosticsProperty('promptText', promptText))..add(DiagnosticsProperty('isListening', isListening))..add(DiagnosticsProperty('isInitializing', isInitializing))..add(DiagnosticsProperty('isSpeechAvailable', isSpeechAvailable))..add(DiagnosticsProperty('soundLevel', soundLevel))..add(DiagnosticsProperty('attachments', attachments))..add(DiagnosticsProperty('errorMessage', errorMessage));
+}
 
 @override
 bool operator ==(Object other) {
@@ -805,7 +883,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,promptText,isListening,isInitializing,isSpeechAvailable,soundLevel,const DeepCollectionEquality().hash(attachments),errorMessage);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatPromptState(promptText: $promptText, isListening: $isListening, isInitializing: $isInitializing, isSpeechAvailable: $isSpeechAvailable, soundLevel: $soundLevel, attachments: $attachments, errorMessage: $errorMessage)';
 }
 
@@ -977,7 +1055,7 @@ return $default(_that.promptText,_that.isListening,_that.isInitializing,_that.is
 /// @nodoc
 
 
-class _LlmChatPromptState implements LlmChatPromptState {
+class _LlmChatPromptState with DiagnosticableTreeMixin implements LlmChatPromptState {
   const _LlmChatPromptState({this.promptText = '', this.isListening = false, this.isInitializing = false, this.isSpeechAvailable = false, this.soundLevel = 0.0, final  List<PromptAttachment> attachments = const [], this.errorMessage}): _attachments = attachments;
   
 
@@ -1002,6 +1080,12 @@ class _LlmChatPromptState implements LlmChatPromptState {
 _$LlmChatPromptStateCopyWith<_LlmChatPromptState> get copyWith => __$LlmChatPromptStateCopyWithImpl<_LlmChatPromptState>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatPromptState'))
+    ..add(DiagnosticsProperty('promptText', promptText))..add(DiagnosticsProperty('isListening', isListening))..add(DiagnosticsProperty('isInitializing', isInitializing))..add(DiagnosticsProperty('isSpeechAvailable', isSpeechAvailable))..add(DiagnosticsProperty('soundLevel', soundLevel))..add(DiagnosticsProperty('attachments', attachments))..add(DiagnosticsProperty('errorMessage', errorMessage));
+}
 
 @override
 bool operator ==(Object other) {
@@ -1013,7 +1097,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,promptText,isListening,isInitializing,isSpeechAvailable,soundLevel,const DeepCollectionEquality().hash(_attachments),errorMessage);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LlmChatPromptState(promptText: $promptText, isListening: $isListening, isInitializing: $isInitializing, isSpeechAvailable: $isSpeechAvailable, soundLevel: $soundLevel, attachments: $attachments, errorMessage: $errorMessage)';
 }
 

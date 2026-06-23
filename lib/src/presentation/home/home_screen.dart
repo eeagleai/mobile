@@ -1,5 +1,7 @@
 import 'package:eeagle_ai/src/di/di_container.dart';
 import 'package:eeagle_ai/src/domain/model/site.dart';
+import 'package:eeagle_ai/src/presentation/analytics/analytics_screen.dart';
+import 'package:eeagle_ai/src/presentation/home/bloc/home_analytics_bloc.dart';
 import 'package:eeagle_ai/src/presentation/home/bloc/home_bloc.dart';
 import 'package:eeagle_ai/src/presentation/home/bloc/sites_bloc.dart';
 import 'package:eeagle_ai/src/presentation/home/widgets/home_logout_button.dart';
@@ -28,6 +30,9 @@ class HomeScreen extends StatelessWidget {
         BlocProvider(
           create: (_) => di<SitesBloc>()..add(const SitesEvent.started()),
         ),
+        BlocProvider(
+          create: (_) => di<HomeAnalyticsBloc>(),
+        ),
       ],
       child: const _HomeSitesView(),
     );
@@ -48,31 +53,58 @@ class _HomeSitesView extends StatelessWidget {
     showHomeSitePreviewSheet(context, site: site);
   }
 
+  Future<void> _openAnalytics(BuildContext context, Site site) async {
+    final analyticsBloc = context.read<HomeAnalyticsBloc>();
+    await Navigator.of(context).pushNamed(
+      RoutesConstants.analytics,
+      arguments: AnalyticsScreenArgs(
+        siteApiKey: site.apikey,
+        siteName: site.name,
+        host: site.host,
+      ),
+    );
+    // Returning from the analytics screen: refetch this site's stats so the
+    // card reflects anything that changed while it was open.
+    analyticsBloc.add(HomeAnalyticsEvent.siteRefreshRequested(site.apikey));
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = EeagleTheme.of(context).colors;
 
-    return BlocListener<HomeBloc, HomeState>(
-      listenWhen: (previous, current) =>
-          previous.logoutSucceeded != current.logoutSucceeded ||
-          (previous.errorMessage != current.errorMessage &&
-              current.errorMessage != null),
-      listener: (context, state) {
-        if (state.logoutSucceeded) {
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            RoutesConstants.login,
-            (route) => false,
-          );
-          return;
-        }
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<HomeBloc, HomeState>(
+          listenWhen: (previous, current) =>
+              previous.logoutSucceeded != current.logoutSucceeded ||
+              (previous.errorMessage != current.errorMessage &&
+                  current.errorMessage != null),
+          listener: (context, state) {
+            if (state.logoutSucceeded) {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                RoutesConstants.login,
+                (route) => false,
+              );
+              return;
+            }
 
-        final errorMessage = state.errorMessage;
-        if (errorMessage != null) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(content: Text(errorMessage)));
-        }
-      },
+            final errorMessage = state.errorMessage;
+            if (errorMessage != null) {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(SnackBar(content: Text(errorMessage)));
+            }
+          },
+        ),
+        BlocListener<SitesBloc, SitesState>(
+          listenWhen: (previous, current) => previous.sites != current.sites,
+          listener: (context, state) {
+            context
+                .read<HomeAnalyticsBloc>()
+                .add(HomeAnalyticsEvent.sitesUpdated(state.sites));
+          },
+        ),
+      ],
       child: Scaffold(
         extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,
@@ -159,6 +191,9 @@ class _HomeSitesView extends StatelessWidget {
     return RefreshIndicator(
       onRefresh: () async {
         context.read<SitesBloc>().add(const SitesEvent.refreshRequested());
+        context
+            .read<HomeAnalyticsBloc>()
+            .add(const HomeAnalyticsEvent.refreshRequested());
         await context.read<SitesBloc>().stream.firstWhere(
               (next) => !next.isRefreshing,
             );
@@ -174,6 +209,7 @@ class _HomeSitesView extends StatelessWidget {
             site: site,
             onTap: () => _openSiteChat(context, site),
             onPreviewTap: () => _previewSite(context, site),
+            onAnalyticsTap: () => _openAnalytics(context, site),
           );
         },
       ),
