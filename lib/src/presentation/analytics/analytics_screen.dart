@@ -1,8 +1,10 @@
-import 'package:eeagle_ai/src/di/di_container.dart';
 import 'package:eeagle_ai/src/domain/model/analytics_event.dart' as domain;
+import 'package:eeagle_ai/src/di/di_container.dart';
+import 'package:eeagle_ai/src/domain/entities/live_conversation_summary.dart';
 import 'package:eeagle_ai/src/presentation/analytics/bloc/analytics_bloc.dart';
 import 'package:eeagle_ai/src/presentation/live_conversation/live_conversation_screen.dart';
 import 'package:eeagle_ai/src/presentation/navigation/routes/routes_constants.dart';
+import 'package:eeagle_ai/src/presentation/analytics/widgets/analytics_conversation_card.dart';
 import 'package:eeagle_ai/src/presentation/analytics/widgets/analytics_event_card.dart';
 import 'package:eeagle_ai/src/presentation/analytics/widgets/analytics_header_card.dart';
 import 'package:eeagle_ai/src/presentation/analytics/widgets/analytics_stat_card.dart';
@@ -15,10 +17,6 @@ import 'package:eeagle_ai/src/presentation/ui/typography/eeagle_text_style.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// Arguments for [AnalyticsScreen], passed via the named route.
-///
-/// `accessToken` is intentionally not threaded here: the shared Dio
-/// `AuthInterceptor` already attaches the bearer token to every request.
 class AnalyticsScreenArgs {
   const AnalyticsScreenArgs({
     required this.siteApiKey,
@@ -51,31 +49,15 @@ class _AnalyticsView extends StatelessWidget {
 
   final AnalyticsScreenArgs args;
 
-  void _onEventTap(BuildContext context, domain.AnalyticsEvent event) {
-    final colors = EeagleTheme.of(context).colors;
-    final conversationId = event.conversationId;
-
-    if (conversationId == null || conversationId.isEmpty) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: EeagleText(
-              'Chat is not available for this event yet. '
-              'The visitor needs to open live chat first.',
-              style: EeagleTextStyles.bodyMedium,
-              textColor: colors.titleNatural,
-            ),
-          ),
+  void _onConversationTap(
+    BuildContext context,
+    LiveConversationSummary conversation,
+  ) {
+    context.read<AnalyticsBloc>().add(
+          AnalyticsEvent.conversationOpened(conversation.conversationId),
         );
-      return;
-    }
 
-    context
-        .read<AnalyticsBloc>()
-        .add(AnalyticsEvent.conversationOpened(conversationId));
-
-    final location = [event.city, event.country]
+    final location = [conversation.city, conversation.country]
         .where((part) => part != null && part.isNotEmpty)
         .join(', ');
 
@@ -83,12 +65,9 @@ class _AnalyticsView extends StatelessWidget {
       RoutesConstants.liveConversation,
       arguments: LiveConversationScreenArgs(
         siteApiKey: args.siteApiKey,
-        conversationId: conversationId,
-        pageUrl: event.pageUrl,
+        conversationId: conversation.conversationId,
+        pageUrl: conversation.pageUrl,
         visitorLocation: location.isEmpty ? null : location,
-        createdAt: event.createdAt,
-        seedMessage:
-            event.eventType == 'live_visitor_message' ? event.message : null,
       ),
     );
   }
@@ -148,6 +127,7 @@ class _AnalyticsView extends StatelessWidget {
   Widget _buildBody(BuildContext context, AnalyticsState state) {
     final isInitialLoading = state.isLoadingStats &&
         state.stats == null &&
+        state.conversations.isEmpty &&
         state.events.isEmpty;
 
     if (isInitialLoading) {
@@ -156,11 +136,13 @@ class _AnalyticsView extends StatelessWidget {
 
     if (state.errorMessage != null &&
         state.stats == null &&
+        state.conversations.isEmpty &&
         state.events.isEmpty) {
       return _ErrorView(
         message: state.errorMessage!,
-        onRetry: () =>
-            context.read<AnalyticsBloc>().add(const AnalyticsEvent.refreshRequested()),
+        onRetry: () => context
+            .read<AnalyticsBloc>()
+            .add(const AnalyticsEvent.refreshRequested()),
       );
     }
 
@@ -173,23 +155,208 @@ class _AnalyticsView extends StatelessWidget {
               (next) => !next.isLoadingStats && !next.isLoadingEvents,
             );
       },
-      child: ListView.separated(
+      child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-        itemCount: state.events.length + 1,
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            sliver: SliverToBoxAdapter(
+              child: _TopSection(args: args, state: state),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            sliver: SliverToBoxAdapter(
+              child: _AnalyticsTabBar(
+                selectedTab: state.selectedTab,
+                onTabSelected: (tab) => context
+                    .read<AnalyticsBloc>()
+                    .add(AnalyticsEvent.tabChanged(tab)),
+              ),
+            ),
+          ),
+          if (state.selectedTab == AnalyticsTab.chats)
+            _ChatsList(
+              conversations: state.conversations,
+              isLoading: state.isLoadingEvents,
+              onTap: (conversation) =>
+                  _onConversationTap(context, conversation),
+            )
+          else
+            _EventsList(
+              events: state.events,
+              isLoading: state.isLoadingEvents,
+            ),
+          const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
+        ],
+      ),
+    );
+  }
+}
+
+class _AnalyticsTabBar extends StatelessWidget {
+  const _AnalyticsTabBar({
+    required this.selectedTab,
+    required this.onTabSelected,
+  });
+
+  final AnalyticsTab selectedTab;
+  final ValueChanged<AnalyticsTab> onTabSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = EeagleTheme.of(context).colors;
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: colors.inputSurface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: colors.chipBorder, width: 0.5),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _TabButton(
+              label: 'Chats',
+              isSelected: selectedTab == AnalyticsTab.chats,
+              onTap: () => onTabSelected(AnalyticsTab.chats),
+            ),
+          ),
+          Expanded(
+            child: _TabButton(
+              label: 'Events',
+              isSelected: selectedTab == AnalyticsTab.events,
+              onTap: () => onTabSelected(AnalyticsTab.events),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TabButton extends StatelessWidget {
+  const _TabButton({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = EeagleTheme.of(context).colors;
+    final accent = colors.palette.primary.shade400;
+
+    return Material(
+      color: isSelected ? accent.withValues(alpha: 0.15) : Colors.transparent,
+      borderRadius: BorderRadius.circular(10),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Center(
+            child: EeagleText(
+              label,
+              style: EeagleTextStyles.bodyMedium,
+              textColor: isSelected ? colors.titleNatural : colors.bodyText,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ChatsList extends StatelessWidget {
+  const _ChatsList({
+    required this.conversations,
+    required this.isLoading,
+    required this.onTap,
+  });
+
+  final List<LiveConversationSummary> conversations;
+  final bool isLoading;
+  final ValueChanged<LiveConversationSummary> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = EeagleTheme.of(context).colors;
+
+    if (conversations.isEmpty && !isLoading) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Center(
+            child: EeagleText(
+              'No chats yet.',
+              style: EeagleTextStyles.bodyLarge,
+              textColor: colors.bodyText,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SliverPadding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      sliver: SliverList.separated(
+        itemCount: conversations.length,
         separatorBuilder: (context, index) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
-          if (index == 0) {
-            return _TopSection(args: args, state: state);
-          }
-          final event = state.events[index - 1];
-          final conversationId = event.conversationId;
-          return AnalyticsEventCard(
-            event: event,
-            hasUnread: conversationId != null &&
-                state.unreadConversationIds.contains(conversationId),
-            onTap: () => _onEventTap(context, event),
+          final conversation = conversations[index];
+          return AnalyticsConversationCard(
+            conversation: conversation,
+            onTap: () => onTap(conversation),
           );
+        },
+      ),
+    );
+  }
+}
+
+class _EventsList extends StatelessWidget {
+  const _EventsList({
+    required this.events,
+    required this.isLoading,
+  });
+
+  final List<domain.AnalyticsEvent> events;
+  final bool isLoading;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = EeagleTheme.of(context).colors;
+
+    if (events.isEmpty && !isLoading) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Center(
+            child: EeagleText(
+              'No events yet.',
+              style: EeagleTextStyles.bodyLarge,
+              textColor: colors.bodyText,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SliverPadding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      sliver: SliverList.separated(
+        itemCount: events.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 12),
+        itemBuilder: (context, index) {
+          return AnalyticsEventCard(event: events[index]);
         },
       ),
     );
@@ -204,7 +371,6 @@ class _TopSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = EeagleTheme.of(context).colors;
     final stats = state.stats;
 
     return Column(
@@ -256,25 +422,6 @@ class _TopSection extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 20),
-        EeagleText(
-          'Recent events',
-          style: EeagleTextStyles.titleMedium,
-          textColor: colors.titleNatural,
-        ),
-        const SizedBox(height: 12),
-        if (state.events.isEmpty && !state.isLoadingEvents)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24),
-            child: Center(
-              child: EeagleText(
-                'No events yet.',
-                style: EeagleTextStyles.bodyLarge,
-                textColor: colors.bodyText,
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
       ],
     );
   }

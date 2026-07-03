@@ -5,6 +5,7 @@ import 'package:eeagle_ai/src/core/logging/app_logger.dart';
 import 'package:eeagle_ai/src/data/models/analytics_event_model.dart';
 import 'package:eeagle_ai/src/domain/model/analytics_event.dart';
 import 'package:eeagle_ai/src/domain/model/analytics_stream_info.dart';
+import 'package:flutter/foundation.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 /// A parsed message coming off the analytics WebSocket.
@@ -34,8 +35,9 @@ class AnalyticsSocketConnectionLost extends AnalyticsSocketMessage {
   const AnalyticsSocketConnectionLost();
 }
 
-/// A live-assist lifecycle event, e.g. `live_chat_opened`
-/// (`{"type":"live_assist_event"}`). Carries a `conversation_id`.
+/// A live-assist lifecycle event, e.g. `live_chat_opened` or
+/// `live_chat_closed` (top-level frame type or nested under
+/// `{"type":"live_assist_event"}`). Carries a `conversation_id`.
 class AnalyticsSocketLiveAssistEvent extends AnalyticsSocketMessage {
   const AnalyticsSocketLiveAssistEvent(this.event);
   final AnalyticsEvent event;
@@ -52,6 +54,74 @@ class AnalyticsSocketVisitorMessage extends AnalyticsSocketMessage {
 class AnalyticsSocketOwnerMessage extends AnalyticsSocketMessage {
   const AnalyticsSocketOwnerMessage(this.event);
   final AnalyticsEvent event;
+}
+
+/// Maps a decoded WebSocket JSON object to a parsed [AnalyticsSocketMessage].
+@visibleForTesting
+AnalyticsSocketMessage? parseAnalyticsSocketFrame(Map<String, dynamic> frame) {
+  switch (frame['type']) {
+    case 'ready':
+      final apikey = frame['apikey'];
+      return AnalyticsSocketReady(apikey is String ? apikey : null);
+    case 'pong':
+      return const AnalyticsSocketPong();
+    case 'analytics_event':
+      final event = parseAnalyticsSocketEvent(frame);
+      return event == null ? null : AnalyticsSocketEvent(event);
+    case 'live_assist_event':
+      final event = parseAnalyticsSocketEvent(frame);
+      return event == null ? null : AnalyticsSocketLiveAssistEvent(event);
+    case 'live_chat_opened':
+      final event = parseAnalyticsSocketEvent(
+        frame,
+        fallbackType: 'live_chat_opened',
+      );
+      return event == null ? null : AnalyticsSocketLiveAssistEvent(event);
+    case 'live_chat_closed':
+      final event = parseAnalyticsSocketEvent(
+        frame,
+        fallbackType: 'live_chat_closed',
+      );
+      return event == null ? null : AnalyticsSocketLiveAssistEvent(event);
+    case 'live_visitor_message':
+      final event = parseAnalyticsSocketEvent(
+        frame,
+        fallbackType: 'live_visitor_message',
+      );
+      return event == null ? null : AnalyticsSocketVisitorMessage(event);
+    case 'live_owner_message':
+      final event = parseAnalyticsSocketEvent(
+        frame,
+        fallbackType: 'live_owner_message',
+      );
+      return event == null ? null : AnalyticsSocketOwnerMessage(event);
+    default:
+      return null;
+  }
+}
+
+/// Parses nested or top-level payload fields into an [AnalyticsEvent].
+@visibleForTesting
+AnalyticsEvent? parseAnalyticsSocketEvent(
+  Map<String, dynamic> frame, {
+  String? fallbackType,
+}) {
+  final nested = frame['event'];
+  final Map<String, dynamic> payload;
+  if (nested is Map<String, dynamic>) {
+    payload = nested;
+  } else {
+    payload = Map<String, dynamic>.from(frame)..remove('type');
+  }
+
+  if (payload.isEmpty) {
+    return null;
+  }
+
+  final json = fallbackType != null && payload['event_type'] == null
+      ? {...payload, 'event_type': fallbackType}
+      : payload;
+  return AnalyticsEventModel.fromJson(json).toEntity();
 }
 
 /// Manages a single live analytics WebSocket connection for one site.
@@ -75,6 +145,9 @@ class AnalyticsSocketService {
   final StreamController<AnalyticsSocketMessage> _controller =
       StreamController<AnalyticsSocketMessage>.broadcast();
 
+  /// Whether a WebSocket channel is currently open.
+  bool get hasOpenConnection => _channel != null && !_disposed;
+
   /// Parsed frames for the owner to listen to.
   Stream<AnalyticsSocketMessage> get messages => _controller.stream;
 
@@ -89,7 +162,7 @@ class AnalyticsSocketService {
 
     try {
       final uri = Uri.parse('${info.wsUrl}?token=${info.token}');
-      print('uri: $uri');
+      appLogger.d('analytics websocket connecting: $uri');
       _channel = WebSocketChannel.connect(uri);
 
       _subscription = _channel!.stream.listen(
@@ -139,16 +212,14 @@ class AnalyticsSocketService {
         return;
       }
 
-      // TEMP diagnostics: surface the exact frame shape so we can verify the
-      // backend's `type` / `conversation_id` against what the app expects.
       final inner = decoded['event'];
       appLogger.d(
         'analytics ws frame: type=${decoded['type']} '
         'innerEventType=${inner is Map ? inner['event_type'] : null} '
-        'conversationId=${inner is Map ? inner['conversation_id'] : null}',
+        'conversationId=${inner is Map ? inner['conversation_id'] : decoded['conversation_id']}',
       );
 
-      final message = _mapFrame(decoded);
+      final message = parseAnalyticsSocketFrame(decoded);
       if (message != null && !_controller.isClosed) {
         _controller.add(message);
       }
@@ -160,46 +231,6 @@ class AnalyticsSocketService {
         stackTrace: stackTrace,
       );
     }
-  }
-
-  AnalyticsSocketMessage? _mapFrame(Map<String, dynamic> frame) {
-    switch (frame['type']) {
-      case 'ready':
-        final apikey = frame['apikey'];
-        return AnalyticsSocketReady(apikey is String ? apikey : null);
-      case 'pong':
-        return const AnalyticsSocketPong();
-      case 'analytics_event':
-        final event = _parseEvent(frame);
-        return event == null ? null : AnalyticsSocketEvent(event);
-      case 'live_assist_event':
-        final event = _parseEvent(frame);
-        return event == null ? null : AnalyticsSocketLiveAssistEvent(event);
-      case 'live_visitor_message':
-        final event = _parseEvent(frame, fallbackType: 'live_visitor_message');
-        return event == null ? null : AnalyticsSocketVisitorMessage(event);
-      case 'live_owner_message':
-        final event = _parseEvent(frame, fallbackType: 'live_owner_message');
-        return event == null ? null : AnalyticsSocketOwnerMessage(event);
-      default:
-        return null;
-    }
-  }
-
-  /// Parses the nested `event` object into an [AnalyticsEvent].
-  /// [fallbackType] is used as `event_type` when the inner object omits it.
-  AnalyticsEvent? _parseEvent(
-    Map<String, dynamic> frame, {
-    String? fallbackType,
-  }) {
-    final event = frame['event'];
-    if (event is! Map<String, dynamic>) {
-      return null;
-    }
-    final json = fallbackType != null && event['event_type'] == null
-        ? {...event, 'event_type': fallbackType}
-        : event;
-    return AnalyticsEventModel.fromJson(json).toEntity();
   }
 
   void _notifyConnectionLost() {

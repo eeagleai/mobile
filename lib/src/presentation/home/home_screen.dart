@@ -39,8 +39,35 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _HomeSitesView extends StatelessWidget {
+class _HomeSitesView extends StatefulWidget {
   const _HomeSitesView();
+
+  @override
+  State<_HomeSitesView> createState() => _HomeSitesViewState();
+}
+
+class _HomeSitesViewState extends State<_HomeSitesView>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      context
+          .read<HomeAnalyticsBloc>()
+          .add(const HomeAnalyticsEvent.appResumed());
+    }
+  }
 
   void _openSiteChat(BuildContext context, Site site) {
     Navigator.of(context).pushNamed(
@@ -55,6 +82,7 @@ class _HomeSitesView extends StatelessWidget {
 
   Future<void> _openAnalytics(BuildContext context, Site site) async {
     final analyticsBloc = context.read<HomeAnalyticsBloc>();
+    analyticsBloc.add(HomeAnalyticsEvent.chatUnreadCleared(site.apikey));
     await Navigator.of(context).pushNamed(
       RoutesConstants.analytics,
       arguments: AnalyticsScreenArgs(

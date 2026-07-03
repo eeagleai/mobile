@@ -20,18 +20,12 @@ class LiveConversationScreenArgs {
     required this.conversationId,
     this.pageUrl,
     this.visitorLocation,
-    this.createdAt,
-    this.seedMessage,
   });
 
   final String siteApiKey;
   final String conversationId;
   final String? pageUrl;
   final String? visitorLocation;
-  final DateTime? createdAt;
-
-  /// Optional first message to show (e.g. the visitor message that was tapped).
-  final String? seedMessage;
 }
 
 class LiveConversationScreen extends StatelessWidget {
@@ -47,8 +41,6 @@ class LiveConversationScreen extends StatelessWidget {
           LiveConversationEvent.started(
             apikey: args.siteApiKey,
             conversationId: args.conversationId,
-            seedMessage: args.seedMessage,
-            seedCreatedAt: args.createdAt,
           ),
         ),
       child: _LiveConversationView(args: args),
@@ -107,7 +99,6 @@ class _LiveConversationView extends StatelessWidget {
                     status: state.status,
                     pageUrl: args.pageUrl,
                     visitorLocation: args.visitorLocation,
-                    createdAt: args.createdAt,
                   ),
                 ),
                 Expanded(
@@ -121,7 +112,7 @@ class _LiveConversationView extends StatelessWidget {
                 LiveConversationComposer(
                   onSend: (text) => context
                       .read<LiveConversationBloc>()
-                      .add(LiveConversationEvent.messageSent(text)),
+                      .add(LiveConversationEvent.messageSent(text: text)),
                 ),
               ],
             ),
@@ -199,7 +190,7 @@ class _MessageListState extends State<_MessageList> {
           message: message,
           onRetry: () => context
               .read<LiveConversationBloc>()
-              .add(LiveConversationEvent.messageRetried(message.id)),
+              .add(LiveConversationEvent.messageRetried(localId: message.id)),
         );
       },
     );

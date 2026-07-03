@@ -86,10 +86,9 @@ class HomeSiteListTile extends StatelessWidget {
                     onTap: onPreviewTap,
                   ),
                   const SizedBox(width: 10),
-                  _IconBox(
-                    icon: Icons.insights_rounded,
-                    color: accent,
-                    tooltip: 'View analytics',
+                  _AnalyticsIconWithBadge(
+                    accent: accent,
+                    apikey: site.apikey,
                     onTap: onAnalyticsTap,
                   ),
                   const SizedBox(width: 10),
@@ -169,6 +168,36 @@ class _IconBox extends StatelessWidget {
     );
 
     return tooltip == null ? tappable : Tooltip(message: tooltip!, child: tappable);
+  }
+}
+
+class _AnalyticsIconWithBadge extends StatelessWidget {
+  const _AnalyticsIconWithBadge({
+    required this.accent,
+    required this.apikey,
+    required this.onTap,
+  });
+
+  final Color accent;
+  final String apikey;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final unreadCount = context.select(
+      (HomeAnalyticsBloc bloc) => bloc.state.forApikey(apikey).unreadChatCount,
+    );
+
+    return Badge(
+      isLabelVisible: unreadCount > 0,
+      label: Text('$unreadCount'),
+      child: _IconBox(
+        icon: Icons.insights_rounded,
+        color: accent,
+        tooltip: 'View analytics',
+        onTap: onTap,
+      ),
+    );
   }
 }
 
