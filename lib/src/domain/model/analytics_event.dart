@@ -1,3 +1,5 @@
+import 'package:eeagle_ai/src/domain/model/chat_event_classifier.dart';
+
 /// A single analytics event for a site.
 ///
 /// Used both for the `/api/analytics/events` history list and for live events
@@ -50,7 +52,6 @@ class AnalyticsEvent {
   final bool? waitingForVisitorReply;
   final DateTime? createdAt;
 
-  /// Whether this event can open a live conversation (it carries a
-  /// `conversation_id`).
-  bool get canOpenChat => (conversationId ?? '').isNotEmpty;
+  /// Whether this row represents a live-assist chat thread the owner can open.
+  bool get canOpenChat => isChatEvent(this);
 }

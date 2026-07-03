@@ -28,4 +28,11 @@ sealed class HomeAnalyticsEvent with _$HomeAnalyticsEvent {
     String apikey,
     AnalyticsSocketMessage message,
   ) = _SocketMessageReceived;
+
+  /// App returned to foreground — reconnect sockets if needed.
+  const factory HomeAnalyticsEvent.appResumed() = _AppResumed;
+
+  /// Clear the home unread badge for [apikey] (e.g. opening Analytics).
+  const factory HomeAnalyticsEvent.chatUnreadCleared(String apikey) =
+      _ChatUnreadCleared;
 }

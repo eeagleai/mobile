@@ -55,7 +55,7 @@ extension HomeAnalyticsEventPatterns on HomeAnalyticsEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _SitesUpdated value)?  sitesUpdated,TResult Function( _RefreshRequested value)?  refreshRequested,TResult Function( _SiteRefreshRequested value)?  siteRefreshRequested,TResult Function( _StatsRequested value)?  statsRequested,TResult Function( _ConnectSocketRequested value)?  connectSocketRequested,TResult Function( _SocketMessageReceived value)?  socketMessageReceived,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _SitesUpdated value)?  sitesUpdated,TResult Function( _RefreshRequested value)?  refreshRequested,TResult Function( _SiteRefreshRequested value)?  siteRefreshRequested,TResult Function( _StatsRequested value)?  statsRequested,TResult Function( _ConnectSocketRequested value)?  connectSocketRequested,TResult Function( _SocketMessageReceived value)?  socketMessageReceived,TResult Function( _AppResumed value)?  appResumed,TResult Function( _ChatUnreadCleared value)?  chatUnreadCleared,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _SitesUpdated() when sitesUpdated != null:
@@ -64,7 +64,9 @@ return refreshRequested(_that);case _SiteRefreshRequested() when siteRefreshRequ
 return siteRefreshRequested(_that);case _StatsRequested() when statsRequested != null:
 return statsRequested(_that);case _ConnectSocketRequested() when connectSocketRequested != null:
 return connectSocketRequested(_that);case _SocketMessageReceived() when socketMessageReceived != null:
-return socketMessageReceived(_that);case _:
+return socketMessageReceived(_that);case _AppResumed() when appResumed != null:
+return appResumed(_that);case _ChatUnreadCleared() when chatUnreadCleared != null:
+return chatUnreadCleared(_that);case _:
   return orElse();
 
 }
@@ -82,7 +84,7 @@ return socketMessageReceived(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _SitesUpdated value)  sitesUpdated,required TResult Function( _RefreshRequested value)  refreshRequested,required TResult Function( _SiteRefreshRequested value)  siteRefreshRequested,required TResult Function( _StatsRequested value)  statsRequested,required TResult Function( _ConnectSocketRequested value)  connectSocketRequested,required TResult Function( _SocketMessageReceived value)  socketMessageReceived,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _SitesUpdated value)  sitesUpdated,required TResult Function( _RefreshRequested value)  refreshRequested,required TResult Function( _SiteRefreshRequested value)  siteRefreshRequested,required TResult Function( _StatsRequested value)  statsRequested,required TResult Function( _ConnectSocketRequested value)  connectSocketRequested,required TResult Function( _SocketMessageReceived value)  socketMessageReceived,required TResult Function( _AppResumed value)  appResumed,required TResult Function( _ChatUnreadCleared value)  chatUnreadCleared,}){
 final _that = this;
 switch (_that) {
 case _SitesUpdated():
@@ -91,7 +93,9 @@ return refreshRequested(_that);case _SiteRefreshRequested():
 return siteRefreshRequested(_that);case _StatsRequested():
 return statsRequested(_that);case _ConnectSocketRequested():
 return connectSocketRequested(_that);case _SocketMessageReceived():
-return socketMessageReceived(_that);}
+return socketMessageReceived(_that);case _AppResumed():
+return appResumed(_that);case _ChatUnreadCleared():
+return chatUnreadCleared(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -105,7 +109,7 @@ return socketMessageReceived(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _SitesUpdated value)?  sitesUpdated,TResult? Function( _RefreshRequested value)?  refreshRequested,TResult? Function( _SiteRefreshRequested value)?  siteRefreshRequested,TResult? Function( _StatsRequested value)?  statsRequested,TResult? Function( _ConnectSocketRequested value)?  connectSocketRequested,TResult? Function( _SocketMessageReceived value)?  socketMessageReceived,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _SitesUpdated value)?  sitesUpdated,TResult? Function( _RefreshRequested value)?  refreshRequested,TResult? Function( _SiteRefreshRequested value)?  siteRefreshRequested,TResult? Function( _StatsRequested value)?  statsRequested,TResult? Function( _ConnectSocketRequested value)?  connectSocketRequested,TResult? Function( _SocketMessageReceived value)?  socketMessageReceived,TResult? Function( _AppResumed value)?  appResumed,TResult? Function( _ChatUnreadCleared value)?  chatUnreadCleared,}){
 final _that = this;
 switch (_that) {
 case _SitesUpdated() when sitesUpdated != null:
@@ -114,7 +118,9 @@ return refreshRequested(_that);case _SiteRefreshRequested() when siteRefreshRequ
 return siteRefreshRequested(_that);case _StatsRequested() when statsRequested != null:
 return statsRequested(_that);case _ConnectSocketRequested() when connectSocketRequested != null:
 return connectSocketRequested(_that);case _SocketMessageReceived() when socketMessageReceived != null:
-return socketMessageReceived(_that);case _:
+return socketMessageReceived(_that);case _AppResumed() when appResumed != null:
+return appResumed(_that);case _ChatUnreadCleared() when chatUnreadCleared != null:
+return chatUnreadCleared(_that);case _:
   return null;
 
 }
@@ -131,7 +137,7 @@ return socketMessageReceived(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( List<Site> sites)?  sitesUpdated,TResult Function()?  refreshRequested,TResult Function( String apikey)?  siteRefreshRequested,TResult Function( String apikey)?  statsRequested,TResult Function( String apikey,  bool isReconnect)?  connectSocketRequested,TResult Function( String apikey,  AnalyticsSocketMessage message)?  socketMessageReceived,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( List<Site> sites)?  sitesUpdated,TResult Function()?  refreshRequested,TResult Function( String apikey)?  siteRefreshRequested,TResult Function( String apikey)?  statsRequested,TResult Function( String apikey,  bool isReconnect)?  connectSocketRequested,TResult Function( String apikey,  AnalyticsSocketMessage message)?  socketMessageReceived,TResult Function()?  appResumed,TResult Function( String apikey)?  chatUnreadCleared,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SitesUpdated() when sitesUpdated != null:
 return sitesUpdated(_that.sites);case _RefreshRequested() when refreshRequested != null:
@@ -139,7 +145,9 @@ return refreshRequested();case _SiteRefreshRequested() when siteRefreshRequested
 return siteRefreshRequested(_that.apikey);case _StatsRequested() when statsRequested != null:
 return statsRequested(_that.apikey);case _ConnectSocketRequested() when connectSocketRequested != null:
 return connectSocketRequested(_that.apikey,_that.isReconnect);case _SocketMessageReceived() when socketMessageReceived != null:
-return socketMessageReceived(_that.apikey,_that.message);case _:
+return socketMessageReceived(_that.apikey,_that.message);case _AppResumed() when appResumed != null:
+return appResumed();case _ChatUnreadCleared() when chatUnreadCleared != null:
+return chatUnreadCleared(_that.apikey);case _:
   return orElse();
 
 }
@@ -157,7 +165,7 @@ return socketMessageReceived(_that.apikey,_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( List<Site> sites)  sitesUpdated,required TResult Function()  refreshRequested,required TResult Function( String apikey)  siteRefreshRequested,required TResult Function( String apikey)  statsRequested,required TResult Function( String apikey,  bool isReconnect)  connectSocketRequested,required TResult Function( String apikey,  AnalyticsSocketMessage message)  socketMessageReceived,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( List<Site> sites)  sitesUpdated,required TResult Function()  refreshRequested,required TResult Function( String apikey)  siteRefreshRequested,required TResult Function( String apikey)  statsRequested,required TResult Function( String apikey,  bool isReconnect)  connectSocketRequested,required TResult Function( String apikey,  AnalyticsSocketMessage message)  socketMessageReceived,required TResult Function()  appResumed,required TResult Function( String apikey)  chatUnreadCleared,}) {final _that = this;
 switch (_that) {
 case _SitesUpdated():
 return sitesUpdated(_that.sites);case _RefreshRequested():
@@ -165,7 +173,9 @@ return refreshRequested();case _SiteRefreshRequested():
 return siteRefreshRequested(_that.apikey);case _StatsRequested():
 return statsRequested(_that.apikey);case _ConnectSocketRequested():
 return connectSocketRequested(_that.apikey,_that.isReconnect);case _SocketMessageReceived():
-return socketMessageReceived(_that.apikey,_that.message);}
+return socketMessageReceived(_that.apikey,_that.message);case _AppResumed():
+return appResumed();case _ChatUnreadCleared():
+return chatUnreadCleared(_that.apikey);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -179,7 +189,7 @@ return socketMessageReceived(_that.apikey,_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( List<Site> sites)?  sitesUpdated,TResult? Function()?  refreshRequested,TResult? Function( String apikey)?  siteRefreshRequested,TResult? Function( String apikey)?  statsRequested,TResult? Function( String apikey,  bool isReconnect)?  connectSocketRequested,TResult? Function( String apikey,  AnalyticsSocketMessage message)?  socketMessageReceived,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( List<Site> sites)?  sitesUpdated,TResult? Function()?  refreshRequested,TResult? Function( String apikey)?  siteRefreshRequested,TResult? Function( String apikey)?  statsRequested,TResult? Function( String apikey,  bool isReconnect)?  connectSocketRequested,TResult? Function( String apikey,  AnalyticsSocketMessage message)?  socketMessageReceived,TResult? Function()?  appResumed,TResult? Function( String apikey)?  chatUnreadCleared,}) {final _that = this;
 switch (_that) {
 case _SitesUpdated() when sitesUpdated != null:
 return sitesUpdated(_that.sites);case _RefreshRequested() when refreshRequested != null:
@@ -187,7 +197,9 @@ return refreshRequested();case _SiteRefreshRequested() when siteRefreshRequested
 return siteRefreshRequested(_that.apikey);case _StatsRequested() when statsRequested != null:
 return statsRequested(_that.apikey);case _ConnectSocketRequested() when connectSocketRequested != null:
 return connectSocketRequested(_that.apikey,_that.isReconnect);case _SocketMessageReceived() when socketMessageReceived != null:
-return socketMessageReceived(_that.apikey,_that.message);case _:
+return socketMessageReceived(_that.apikey,_that.message);case _AppResumed() when appResumed != null:
+return appResumed();case _ChatUnreadCleared() when chatUnreadCleared != null:
+return chatUnreadCleared(_that.apikey);case _:
   return null;
 
 }
@@ -561,6 +573,104 @@ class __$SocketMessageReceivedCopyWithImpl<$Res>
 null == apikey ? _self.apikey : apikey // ignore: cast_nullable_to_non_nullable
 as String,null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as AnalyticsSocketMessage,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class _AppResumed implements HomeAnalyticsEvent {
+  const _AppResumed();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppResumed);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'HomeAnalyticsEvent.appResumed()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _ChatUnreadCleared implements HomeAnalyticsEvent {
+  const _ChatUnreadCleared(this.apikey);
+  
+
+ final  String apikey;
+
+/// Create a copy of HomeAnalyticsEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ChatUnreadClearedCopyWith<_ChatUnreadCleared> get copyWith => __$ChatUnreadClearedCopyWithImpl<_ChatUnreadCleared>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatUnreadCleared&&(identical(other.apikey, apikey) || other.apikey == apikey));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,apikey);
+
+@override
+String toString() {
+  return 'HomeAnalyticsEvent.chatUnreadCleared(apikey: $apikey)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ChatUnreadClearedCopyWith<$Res> implements $HomeAnalyticsEventCopyWith<$Res> {
+  factory _$ChatUnreadClearedCopyWith(_ChatUnreadCleared value, $Res Function(_ChatUnreadCleared) _then) = __$ChatUnreadClearedCopyWithImpl;
+@useResult
+$Res call({
+ String apikey
+});
+
+
+
+
+}
+/// @nodoc
+class __$ChatUnreadClearedCopyWithImpl<$Res>
+    implements _$ChatUnreadClearedCopyWith<$Res> {
+  __$ChatUnreadClearedCopyWithImpl(this._self, this._then);
+
+  final _ChatUnreadCleared _self;
+  final $Res Function(_ChatUnreadCleared) _then;
+
+/// Create a copy of HomeAnalyticsEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? apikey = null,}) {
+  return _then(_ChatUnreadCleared(
+null == apikey ? _self.apikey : apikey // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 

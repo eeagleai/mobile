@@ -8,12 +8,14 @@ class SiteAnalyticsState {
     this.isLoading = false,
     this.hasError = false,
     this.status = AnalyticsConnectionStatus.offline,
+    this.unreadChatCount = 0,
   });
 
   final AnalyticsStats? stats;
   final bool isLoading;
   final bool hasError;
   final AnalyticsConnectionStatus status;
+  final int unreadChatCount;
 
   @override
   bool operator ==(Object other) {
@@ -27,7 +29,8 @@ class SiteAnalyticsState {
         other.stats?.lastEventAt == stats?.lastEventAt &&
         other.isLoading == isLoading &&
         other.hasError == hasError &&
-        other.status == status;
+        other.status == status &&
+        other.unreadChatCount == unreadChatCount;
   }
 
   @override
@@ -39,5 +42,6 @@ class SiteAnalyticsState {
         isLoading,
         hasError,
         status,
+        unreadChatCount,
       );
 }

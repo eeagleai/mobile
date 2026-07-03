@@ -16,6 +16,7 @@ class ApiConfig {
   static const String analyticsEventsPath = '/api/analytics/events';
   static const String analyticsStreamTokenPath = '/api/analytics/stream-token';
   static const String liveAssistSendPath = '/api/live-assist/send';
+  static const String mobileFcmTokenPath = '/api/mobile/devices/fcm-token';
 
   static const Duration connectTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);

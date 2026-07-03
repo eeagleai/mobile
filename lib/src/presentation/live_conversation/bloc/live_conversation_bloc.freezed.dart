@@ -55,13 +55,13 @@ extension LiveConversationEventPatterns on LiveConversationEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Started value)?  started,TResult Function( _ConnectSocketRequested value)?  connectSocketRequested,TResult Function( _SocketMessageReceived value)?  socketMessageReceived,TResult Function( _MessageSent value)?  messageSent,TResult Function( _MessageRetried value)?  messageRetried,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Started value)?  started,TResult Function( _MessagesUpdated value)?  messagesUpdated,TResult Function( _ConnectionStatusPolled value)?  connectionStatusPolled,TResult Function( _MessageSent value)?  messageSent,TResult Function( _MessageRetried value)?  messageRetried,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _Started() when started != null:
-return started(_that);case _ConnectSocketRequested() when connectSocketRequested != null:
-return connectSocketRequested(_that);case _SocketMessageReceived() when socketMessageReceived != null:
-return socketMessageReceived(_that);case _MessageSent() when messageSent != null:
+return started(_that);case _MessagesUpdated() when messagesUpdated != null:
+return messagesUpdated(_that);case _ConnectionStatusPolled() when connectionStatusPolled != null:
+return connectionStatusPolled(_that);case _MessageSent() when messageSent != null:
 return messageSent(_that);case _MessageRetried() when messageRetried != null:
 return messageRetried(_that);case _:
   return orElse();
@@ -81,13 +81,13 @@ return messageRetried(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Started value)  started,required TResult Function( _ConnectSocketRequested value)  connectSocketRequested,required TResult Function( _SocketMessageReceived value)  socketMessageReceived,required TResult Function( _MessageSent value)  messageSent,required TResult Function( _MessageRetried value)  messageRetried,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Started value)  started,required TResult Function( _MessagesUpdated value)  messagesUpdated,required TResult Function( _ConnectionStatusPolled value)  connectionStatusPolled,required TResult Function( _MessageSent value)  messageSent,required TResult Function( _MessageRetried value)  messageRetried,}){
 final _that = this;
 switch (_that) {
 case _Started():
-return started(_that);case _ConnectSocketRequested():
-return connectSocketRequested(_that);case _SocketMessageReceived():
-return socketMessageReceived(_that);case _MessageSent():
+return started(_that);case _MessagesUpdated():
+return messagesUpdated(_that);case _ConnectionStatusPolled():
+return connectionStatusPolled(_that);case _MessageSent():
 return messageSent(_that);case _MessageRetried():
 return messageRetried(_that);}
 }
@@ -103,13 +103,13 @@ return messageRetried(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Started value)?  started,TResult? Function( _ConnectSocketRequested value)?  connectSocketRequested,TResult? Function( _SocketMessageReceived value)?  socketMessageReceived,TResult? Function( _MessageSent value)?  messageSent,TResult? Function( _MessageRetried value)?  messageRetried,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Started value)?  started,TResult? Function( _MessagesUpdated value)?  messagesUpdated,TResult? Function( _ConnectionStatusPolled value)?  connectionStatusPolled,TResult? Function( _MessageSent value)?  messageSent,TResult? Function( _MessageRetried value)?  messageRetried,}){
 final _that = this;
 switch (_that) {
 case _Started() when started != null:
-return started(_that);case _ConnectSocketRequested() when connectSocketRequested != null:
-return connectSocketRequested(_that);case _SocketMessageReceived() when socketMessageReceived != null:
-return socketMessageReceived(_that);case _MessageSent() when messageSent != null:
+return started(_that);case _MessagesUpdated() when messagesUpdated != null:
+return messagesUpdated(_that);case _ConnectionStatusPolled() when connectionStatusPolled != null:
+return connectionStatusPolled(_that);case _MessageSent() when messageSent != null:
 return messageSent(_that);case _MessageRetried() when messageRetried != null:
 return messageRetried(_that);case _:
   return null;
@@ -128,12 +128,12 @@ return messageRetried(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String apikey,  String conversationId,  String? seedMessage,  DateTime? seedCreatedAt)?  started,TResult Function( bool isReconnect)?  connectSocketRequested,TResult Function( AnalyticsSocketMessage message)?  socketMessageReceived,TResult Function( String text)?  messageSent,TResult Function( String localId)?  messageRetried,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String apikey,  String conversationId)?  started,TResult Function( List<LiveChatMessage> messages)?  messagesUpdated,TResult Function( AnalyticsConnectionStatus status)?  connectionStatusPolled,TResult Function( String text)?  messageSent,TResult Function( String localId)?  messageRetried,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Started() when started != null:
-return started(_that.apikey,_that.conversationId,_that.seedMessage,_that.seedCreatedAt);case _ConnectSocketRequested() when connectSocketRequested != null:
-return connectSocketRequested(_that.isReconnect);case _SocketMessageReceived() when socketMessageReceived != null:
-return socketMessageReceived(_that.message);case _MessageSent() when messageSent != null:
+return started(_that.apikey,_that.conversationId);case _MessagesUpdated() when messagesUpdated != null:
+return messagesUpdated(_that.messages);case _ConnectionStatusPolled() when connectionStatusPolled != null:
+return connectionStatusPolled(_that.status);case _MessageSent() when messageSent != null:
 return messageSent(_that.text);case _MessageRetried() when messageRetried != null:
 return messageRetried(_that.localId);case _:
   return orElse();
@@ -153,12 +153,12 @@ return messageRetried(_that.localId);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String apikey,  String conversationId,  String? seedMessage,  DateTime? seedCreatedAt)  started,required TResult Function( bool isReconnect)  connectSocketRequested,required TResult Function( AnalyticsSocketMessage message)  socketMessageReceived,required TResult Function( String text)  messageSent,required TResult Function( String localId)  messageRetried,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String apikey,  String conversationId)  started,required TResult Function( List<LiveChatMessage> messages)  messagesUpdated,required TResult Function( AnalyticsConnectionStatus status)  connectionStatusPolled,required TResult Function( String text)  messageSent,required TResult Function( String localId)  messageRetried,}) {final _that = this;
 switch (_that) {
 case _Started():
-return started(_that.apikey,_that.conversationId,_that.seedMessage,_that.seedCreatedAt);case _ConnectSocketRequested():
-return connectSocketRequested(_that.isReconnect);case _SocketMessageReceived():
-return socketMessageReceived(_that.message);case _MessageSent():
+return started(_that.apikey,_that.conversationId);case _MessagesUpdated():
+return messagesUpdated(_that.messages);case _ConnectionStatusPolled():
+return connectionStatusPolled(_that.status);case _MessageSent():
 return messageSent(_that.text);case _MessageRetried():
 return messageRetried(_that.localId);}
 }
@@ -174,12 +174,12 @@ return messageRetried(_that.localId);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String apikey,  String conversationId,  String? seedMessage,  DateTime? seedCreatedAt)?  started,TResult? Function( bool isReconnect)?  connectSocketRequested,TResult? Function( AnalyticsSocketMessage message)?  socketMessageReceived,TResult? Function( String text)?  messageSent,TResult? Function( String localId)?  messageRetried,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String apikey,  String conversationId)?  started,TResult? Function( List<LiveChatMessage> messages)?  messagesUpdated,TResult? Function( AnalyticsConnectionStatus status)?  connectionStatusPolled,TResult? Function( String text)?  messageSent,TResult? Function( String localId)?  messageRetried,}) {final _that = this;
 switch (_that) {
 case _Started() when started != null:
-return started(_that.apikey,_that.conversationId,_that.seedMessage,_that.seedCreatedAt);case _ConnectSocketRequested() when connectSocketRequested != null:
-return connectSocketRequested(_that.isReconnect);case _SocketMessageReceived() when socketMessageReceived != null:
-return socketMessageReceived(_that.message);case _MessageSent() when messageSent != null:
+return started(_that.apikey,_that.conversationId);case _MessagesUpdated() when messagesUpdated != null:
+return messagesUpdated(_that.messages);case _ConnectionStatusPolled() when connectionStatusPolled != null:
+return connectionStatusPolled(_that.status);case _MessageSent() when messageSent != null:
 return messageSent(_that.text);case _MessageRetried() when messageRetried != null:
 return messageRetried(_that.localId);case _:
   return null;
@@ -193,13 +193,11 @@ return messageRetried(_that.localId);case _:
 
 
 class _Started implements LiveConversationEvent {
-  const _Started({required this.apikey, required this.conversationId, this.seedMessage, this.seedCreatedAt});
+  const _Started({required this.apikey, required this.conversationId});
   
 
  final  String apikey;
  final  String conversationId;
- final  String? seedMessage;
- final  DateTime? seedCreatedAt;
 
 /// Create a copy of LiveConversationEvent
 /// with the given fields replaced by the non-null parameter values.
@@ -211,16 +209,16 @@ _$StartedCopyWith<_Started> get copyWith => __$StartedCopyWithImpl<_Started>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Started&&(identical(other.apikey, apikey) || other.apikey == apikey)&&(identical(other.conversationId, conversationId) || other.conversationId == conversationId)&&(identical(other.seedMessage, seedMessage) || other.seedMessage == seedMessage)&&(identical(other.seedCreatedAt, seedCreatedAt) || other.seedCreatedAt == seedCreatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Started&&(identical(other.apikey, apikey) || other.apikey == apikey)&&(identical(other.conversationId, conversationId) || other.conversationId == conversationId));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,apikey,conversationId,seedMessage,seedCreatedAt);
+int get hashCode => Object.hash(runtimeType,apikey,conversationId);
 
 @override
 String toString() {
-  return 'LiveConversationEvent.started(apikey: $apikey, conversationId: $conversationId, seedMessage: $seedMessage, seedCreatedAt: $seedCreatedAt)';
+  return 'LiveConversationEvent.started(apikey: $apikey, conversationId: $conversationId)';
 }
 
 
@@ -231,7 +229,7 @@ abstract mixin class _$StartedCopyWith<$Res> implements $LiveConversationEventCo
   factory _$StartedCopyWith(_Started value, $Res Function(_Started) _then) = __$StartedCopyWithImpl;
 @useResult
 $Res call({
- String apikey, String conversationId, String? seedMessage, DateTime? seedCreatedAt
+ String apikey, String conversationId
 });
 
 
@@ -248,13 +246,11 @@ class __$StartedCopyWithImpl<$Res>
 
 /// Create a copy of LiveConversationEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? apikey = null,Object? conversationId = null,Object? seedMessage = freezed,Object? seedCreatedAt = freezed,}) {
+@pragma('vm:prefer-inline') $Res call({Object? apikey = null,Object? conversationId = null,}) {
   return _then(_Started(
 apikey: null == apikey ? _self.apikey : apikey // ignore: cast_nullable_to_non_nullable
 as String,conversationId: null == conversationId ? _self.conversationId : conversationId // ignore: cast_nullable_to_non_nullable
-as String,seedMessage: freezed == seedMessage ? _self.seedMessage : seedMessage // ignore: cast_nullable_to_non_nullable
-as String?,seedCreatedAt: freezed == seedCreatedAt ? _self.seedCreatedAt : seedCreatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as String,
   ));
 }
 
@@ -264,43 +260,49 @@ as DateTime?,
 /// @nodoc
 
 
-class _ConnectSocketRequested implements LiveConversationEvent {
-  const _ConnectSocketRequested({this.isReconnect = false});
+class _MessagesUpdated implements LiveConversationEvent {
+  const _MessagesUpdated(final  List<LiveChatMessage> messages): _messages = messages;
   
 
-@JsonKey() final  bool isReconnect;
+ final  List<LiveChatMessage> _messages;
+ List<LiveChatMessage> get messages {
+  if (_messages is EqualUnmodifiableListView) return _messages;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_messages);
+}
+
 
 /// Create a copy of LiveConversationEvent
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$ConnectSocketRequestedCopyWith<_ConnectSocketRequested> get copyWith => __$ConnectSocketRequestedCopyWithImpl<_ConnectSocketRequested>(this, _$identity);
+_$MessagesUpdatedCopyWith<_MessagesUpdated> get copyWith => __$MessagesUpdatedCopyWithImpl<_MessagesUpdated>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ConnectSocketRequested&&(identical(other.isReconnect, isReconnect) || other.isReconnect == isReconnect));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MessagesUpdated&&const DeepCollectionEquality().equals(other._messages, _messages));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isReconnect);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_messages));
 
 @override
 String toString() {
-  return 'LiveConversationEvent.connectSocketRequested(isReconnect: $isReconnect)';
+  return 'LiveConversationEvent.messagesUpdated(messages: $messages)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$ConnectSocketRequestedCopyWith<$Res> implements $LiveConversationEventCopyWith<$Res> {
-  factory _$ConnectSocketRequestedCopyWith(_ConnectSocketRequested value, $Res Function(_ConnectSocketRequested) _then) = __$ConnectSocketRequestedCopyWithImpl;
+abstract mixin class _$MessagesUpdatedCopyWith<$Res> implements $LiveConversationEventCopyWith<$Res> {
+  factory _$MessagesUpdatedCopyWith(_MessagesUpdated value, $Res Function(_MessagesUpdated) _then) = __$MessagesUpdatedCopyWithImpl;
 @useResult
 $Res call({
- bool isReconnect
+ List<LiveChatMessage> messages
 });
 
 
@@ -308,19 +310,19 @@ $Res call({
 
 }
 /// @nodoc
-class __$ConnectSocketRequestedCopyWithImpl<$Res>
-    implements _$ConnectSocketRequestedCopyWith<$Res> {
-  __$ConnectSocketRequestedCopyWithImpl(this._self, this._then);
+class __$MessagesUpdatedCopyWithImpl<$Res>
+    implements _$MessagesUpdatedCopyWith<$Res> {
+  __$MessagesUpdatedCopyWithImpl(this._self, this._then);
 
-  final _ConnectSocketRequested _self;
-  final $Res Function(_ConnectSocketRequested) _then;
+  final _MessagesUpdated _self;
+  final $Res Function(_MessagesUpdated) _then;
 
 /// Create a copy of LiveConversationEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? isReconnect = null,}) {
-  return _then(_ConnectSocketRequested(
-isReconnect: null == isReconnect ? _self.isReconnect : isReconnect // ignore: cast_nullable_to_non_nullable
-as bool,
+@pragma('vm:prefer-inline') $Res call({Object? messages = null,}) {
+  return _then(_MessagesUpdated(
+null == messages ? _self._messages : messages // ignore: cast_nullable_to_non_nullable
+as List<LiveChatMessage>,
   ));
 }
 
@@ -330,43 +332,43 @@ as bool,
 /// @nodoc
 
 
-class _SocketMessageReceived implements LiveConversationEvent {
-  const _SocketMessageReceived(this.message);
+class _ConnectionStatusPolled implements LiveConversationEvent {
+  const _ConnectionStatusPolled(this.status);
   
 
- final  AnalyticsSocketMessage message;
+ final  AnalyticsConnectionStatus status;
 
 /// Create a copy of LiveConversationEvent
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$SocketMessageReceivedCopyWith<_SocketMessageReceived> get copyWith => __$SocketMessageReceivedCopyWithImpl<_SocketMessageReceived>(this, _$identity);
+_$ConnectionStatusPolledCopyWith<_ConnectionStatusPolled> get copyWith => __$ConnectionStatusPolledCopyWithImpl<_ConnectionStatusPolled>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SocketMessageReceived&&(identical(other.message, message) || other.message == message));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ConnectionStatusPolled&&(identical(other.status, status) || other.status == status));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,message);
+int get hashCode => Object.hash(runtimeType,status);
 
 @override
 String toString() {
-  return 'LiveConversationEvent.socketMessageReceived(message: $message)';
+  return 'LiveConversationEvent.connectionStatusPolled(status: $status)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$SocketMessageReceivedCopyWith<$Res> implements $LiveConversationEventCopyWith<$Res> {
-  factory _$SocketMessageReceivedCopyWith(_SocketMessageReceived value, $Res Function(_SocketMessageReceived) _then) = __$SocketMessageReceivedCopyWithImpl;
+abstract mixin class _$ConnectionStatusPolledCopyWith<$Res> implements $LiveConversationEventCopyWith<$Res> {
+  factory _$ConnectionStatusPolledCopyWith(_ConnectionStatusPolled value, $Res Function(_ConnectionStatusPolled) _then) = __$ConnectionStatusPolledCopyWithImpl;
 @useResult
 $Res call({
- AnalyticsSocketMessage message
+ AnalyticsConnectionStatus status
 });
 
 
@@ -374,19 +376,19 @@ $Res call({
 
 }
 /// @nodoc
-class __$SocketMessageReceivedCopyWithImpl<$Res>
-    implements _$SocketMessageReceivedCopyWith<$Res> {
-  __$SocketMessageReceivedCopyWithImpl(this._self, this._then);
+class __$ConnectionStatusPolledCopyWithImpl<$Res>
+    implements _$ConnectionStatusPolledCopyWith<$Res> {
+  __$ConnectionStatusPolledCopyWithImpl(this._self, this._then);
 
-  final _SocketMessageReceived _self;
-  final $Res Function(_SocketMessageReceived) _then;
+  final _ConnectionStatusPolled _self;
+  final $Res Function(_ConnectionStatusPolled) _then;
 
 /// Create a copy of LiveConversationEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
-  return _then(_SocketMessageReceived(
-null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as AnalyticsSocketMessage,
+@pragma('vm:prefer-inline') $Res call({Object? status = null,}) {
+  return _then(_ConnectionStatusPolled(
+null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as AnalyticsConnectionStatus,
   ));
 }
 
@@ -397,7 +399,7 @@ as AnalyticsSocketMessage,
 
 
 class _MessageSent implements LiveConversationEvent {
-  const _MessageSent(this.text);
+  const _MessageSent({required this.text});
   
 
  final  String text;
@@ -451,7 +453,7 @@ class __$MessageSentCopyWithImpl<$Res>
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? text = null,}) {
   return _then(_MessageSent(
-null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -463,7 +465,7 @@ as String,
 
 
 class _MessageRetried implements LiveConversationEvent {
-  const _MessageRetried(this.localId);
+  const _MessageRetried({required this.localId});
   
 
  final  String localId;
@@ -517,7 +519,7 @@ class __$MessageRetriedCopyWithImpl<$Res>
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? localId = null,}) {
   return _then(_MessageRetried(
-null == localId ? _self.localId : localId // ignore: cast_nullable_to_non_nullable
+localId: null == localId ? _self.localId : localId // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

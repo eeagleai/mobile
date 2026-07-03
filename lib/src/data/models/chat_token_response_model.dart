@@ -1,6 +1,5 @@
 import 'package:eeagle_ai/src/data/models/chat_session_config_model.dart';
 import 'package:eeagle_ai/src/domain/model/chat_session.dart';
-import 'package:eeagle_ai/src/domain/model/chat_session_config.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'chat_token_response_model.freezed.dart';

@@ -4,11 +4,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class TokenStorageService {
   TokenStorageService({FlutterSecureStorage? secureStorage})
-      : _secureStorage = secureStorage ??
-            const FlutterSecureStorage(
-              aOptions: AndroidOptions(encryptedSharedPreferences: true),
-              mOptions: MacOsOptions(),
-            );
+    : _secureStorage =
+          secureStorage ??
+          const FlutterSecureStorage(
+            aOptions: AndroidOptions(encryptedSharedPreferences: true),
+            mOptions: MacOsOptions(),
+          );
 
   static const _accessTokenKey = 'access_token';
   static const _expiresAtKey = 'access_token_expires_at';
@@ -49,8 +50,9 @@ class TokenStorageService {
     final expiresAtRaw = await _secureStorage.read(key: _expiresAtKey);
     final userId = await _secureStorage.read(key: _userIdKey) ?? '';
     final userEmail = await _secureStorage.read(key: _userEmailKey) ?? '';
-    final emailVerifiedRaw =
-        await _secureStorage.read(key: _userEmailVerifiedKey);
+    final emailVerifiedRaw = await _secureStorage.read(
+      key: _userEmailVerifiedKey,
+    );
     final adminRaw = await _secureStorage.read(key: _userAdminKey);
 
     return AuthSession(
@@ -66,6 +68,11 @@ class TokenStorageService {
   }
 
   Future<void> clearSession() async {
-    await _secureStorage.deleteAll();
+    await _secureStorage.delete(key: _accessTokenKey);
+    await _secureStorage.delete(key: _expiresAtKey);
+    await _secureStorage.delete(key: _userIdKey);
+    await _secureStorage.delete(key: _userEmailKey);
+    await _secureStorage.delete(key: _userEmailVerifiedKey);
+    await _secureStorage.delete(key: _userAdminKey);
   }
 }

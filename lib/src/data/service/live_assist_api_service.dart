@@ -33,7 +33,6 @@ class LiveAssistApiService {
       ApiConfig.liveAssistSendPath,
       data: payload,
     );
-    print('response: ${response.statusCode}');
 
     appLogger.d(
       'live-assist send ← status=${response.statusCode} body=${response.data}',
