@@ -50,6 +50,7 @@ import 'package:eeagle_ai/src/domain/use_case/save_owner_message_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/send_chat_message_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/send_live_assist_message_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/save_fcm_token_use_case.dart';
+import 'package:eeagle_ai/src/domain/use_case/signup_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/sync_fcm_token_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/watch_chat_inbound_events_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/watch_conversation_messages_use_case.dart';
@@ -65,6 +66,7 @@ import 'package:eeagle_ai/src/presentation/live_conversation/bloc/live_conversat
 import 'package:eeagle_ai/src/presentation/llm_chat/bloc/llm_chat_prompt_bloc.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/bloc/llm_chat_session_bloc.dart';
 import 'package:eeagle_ai/src/presentation/login/bloc/login_bloc.dart';
+import 'package:eeagle_ai/src/presentation/signup/bloc/signup_bloc.dart';
 import 'package:eeagle_ai/src/presentation/splash/bloc/auth_bootstrap_bloc.dart';
 import 'package:injectable/injectable.dart';
 
@@ -162,10 +164,18 @@ abstract class RegisterModule {
       LoginUseCase(authRepository);
 
   @factoryMethod
+  SignupUseCase signupUseCase(AuthRepository authRepository) =>
+      SignupUseCase(authRepository);
+
+  @factoryMethod
   LoginBloc loginBloc(
     LoginUseCase loginUseCase,
     SyncFcmTokenUseCase syncFcmTokenUseCase,
   ) => LoginBloc(loginUseCase, syncFcmTokenUseCase);
+
+  @factoryMethod
+  SignupBloc signupBloc(SignupUseCase signupUseCase) =>
+      SignupBloc(signupUseCase);
 
   @factoryMethod
   RestoreSessionUseCase restoreSessionUseCase(AuthRepository authRepository) =>

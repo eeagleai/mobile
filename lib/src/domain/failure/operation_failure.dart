@@ -49,6 +49,24 @@ class OperationFailure {
     );
   }
 
+  factory OperationFailure.fromResponse({
+    required int statusCode,
+    required Object? data,
+  }) {
+    if (statusCode == 423) {
+      return OperationFailure(
+        _extractLockedMessage(data) ??
+            'Your account is locked. Please upgrade to continue.',
+        code: 'account_locked',
+      );
+    }
+
+    return OperationFailure(
+      _extractMessage(data) ?? 'Request failed with status $statusCode.',
+      code: 'http-$statusCode',
+    );
+  }
+
   static String? _extractLockedMessage(Object? data) {
     if (data is Map<String, dynamic>) {
       final message = data['message'];
@@ -67,6 +85,20 @@ class OperationFailure {
         final firstError = errors.first;
         if (firstError is String && firstError.isNotEmpty) {
           return firstError;
+        }
+      }
+      if (errors is Map && errors.isNotEmpty) {
+        for (final entry in errors.entries) {
+          final value = entry.value;
+          if (value is List && value.isNotEmpty) {
+            final firstError = value.first;
+            if (firstError is String && firstError.isNotEmpty) {
+              return firstError;
+            }
+          }
+          if (value is String && value.isNotEmpty) {
+            return value;
+          }
         }
       }
 

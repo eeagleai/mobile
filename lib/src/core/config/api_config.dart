@@ -8,6 +8,8 @@ class ApiConfig {
   );
 
   static const String mobileAuthLoginPath = '/api/mobile/auth/login';
+  static const String authSessionPath = '/api/auth/session';
+  static const String authSignupPath = '/api/auth/signup';
   static const String sitesPath = '/api/sites';
   static const String chatTokenPath = '/api/chat/token';
   static const String defaultChatModel = 'eeagle-default';
@@ -17,7 +19,6 @@ class ApiConfig {
   static const String analyticsStreamTokenPath = '/api/analytics/stream-token';
   static const String liveAssistSendPath = '/api/live-assist/send';
   static const String mobileFcmTokenPath = '/api/mobile/devices/fcm-token';
-
   static const Duration connectTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
 }

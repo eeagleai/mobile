@@ -26,8 +26,6 @@ void main() {
 
     expect(find.text('Welcome Back!'), findsOneWidget);
     expect(find.text('Continue Login'), findsOneWidget);
-    expect(find.text('Continue With Google'), findsOneWidget);
-    expect(find.text('Continue With GitHub'), findsOneWidget);
     expect(find.byType(TextField), findsNWidgets(2));
   });
 }

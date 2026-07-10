@@ -9,15 +9,22 @@ class LoggingInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
-    appLogger.d('← ${response.statusCode} ${response.requestOptions.uri}');
+  void onResponse(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) {
+    appLogger.d(
+      '← ${response.statusCode} ${response.requestOptions.uri} '
+      'response: ${response.data}',
+    );
     handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     appLogger.w(
-      '✗ ${err.requestOptions.method} ${err.requestOptions.uri}',
+      '✗ ${err.requestOptions.method} ${err.requestOptions.uri} '
+      'status=${err.response?.statusCode} response: ${err.response?.data}',
       error: err,
     );
     handler.next(err);

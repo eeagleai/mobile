@@ -9,7 +9,6 @@ class SaveFcmTokenUseCase {
   final MobileDeviceRepository _repository;
 
   TaskEither<OperationFailure, Unit> call(MobileDeviceFcmToken token) {
-    print('SaveFcmTokenUseCase: ${token}');
     return _repository.saveFcmToken(token);
   }
 }
