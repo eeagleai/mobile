@@ -11,7 +11,7 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    if (!_isMobileLoginRequest(options)) {
+    if (!_shouldSkipAuth(options)) {
       final accessToken = _sessionStore.accessToken;
       if (accessToken != null && accessToken.isNotEmpty) {
         options.headers['Authorization'] = 'Bearer $accessToken';
@@ -23,7 +23,8 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    if (err.response?.statusCode == 401 && !_isMobileLoginRequest(err.requestOptions)) {
+    if (err.response?.statusCode == 401 &&
+        !_shouldSkipAuth(err.requestOptions)) {
       _sessionStore.clear();
       await _tokenStorage.clearSession();
     }
@@ -34,5 +35,9 @@ class AuthInterceptor extends Interceptor {
   bool _isMobileLoginRequest(RequestOptions options) {
     return options.method.toUpperCase() == 'POST' &&
         options.path.endsWith(ApiConfig.mobileAuthLoginPath);
+  }
+
+  bool _shouldSkipAuth(RequestOptions options) {
+    return options.extra['skipAuth'] == true || _isMobileLoginRequest(options);
   }
 }

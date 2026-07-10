@@ -2,7 +2,6 @@ import 'package:eeagle_ai/src/di/di_container.dart';
 import 'package:eeagle_ai/src/presentation/login/bloc/login_bloc.dart';
 import 'package:eeagle_ai/src/presentation/login/widgets/login_or_divider.dart';
 import 'package:eeagle_ai/src/presentation/login/widgets/login_primary_button.dart';
-import 'package:eeagle_ai/src/presentation/login/widgets/login_social_button.dart';
 import 'package:eeagle_ai/src/presentation/navigation/routes/routes_constants.dart';
 import 'package:eeagle_ai/src/presentation/ui/components/eeagle_screen_background.dart';
 import 'package:eeagle_ai/src/presentation/ui/components/eeagle_text_field.dart';
@@ -47,11 +46,11 @@ class _LoginViewState extends State<_LoginView> {
 
   void _submitLogin() {
     context.read<LoginBloc>().add(
-          LoginEvent.loginSubmitted(
-            email: _emailController.text,
-            password: _passwordController.text,
-          ),
-        );
+      LoginEvent.loginSubmitted(
+        email: _emailController.text,
+        password: _passwordController.text,
+      ),
+    );
   }
 
   @override
@@ -108,7 +107,7 @@ class _LoginViewState extends State<_LoginView> {
                               ),
                               const SizedBox(height: 12),
                               EeagleText(
-                                'Access your Aurenix Workspace and Continue where you left off ',
+                                'Access your Aurenix Workspace and continue where you left off',
                                 style: EeagleTextStyles.bodyLarge,
                                 textColor: colors.bodyText,
                                 textAlign: TextAlign.center,
@@ -154,12 +153,8 @@ class _LoginViewState extends State<_LoginView> {
                                   onTap: () {},
                                   child: EeagleText(
                                     'Forgot Password?',
-                                    style:
-                                        EeagleTextStyles.bodyMedium.copyWith(
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: colors.bodyText,
-                                    ),
-                                    textColor: colors.bodyText,
+                                    style: EeagleTextStyles.bodyMedium,
+                                    textColor: colors.brandPrimary,
                                   ),
                                 ),
                               ),
@@ -181,25 +176,13 @@ class _LoginViewState extends State<_LoginView> {
                               const SizedBox(height: 27),
                               const LoginOrDivider(),
                               const SizedBox(height: 16),
-                              LoginSocialButton(
-                                label: 'Continue With Google',
-                                icon: Assets.icons.login.icGoogle,
-                                onTap: () {},
-                              ),
-                              const SizedBox(height: 12),
-                              LoginSocialButton(
-                                label: 'Continue With GitHub',
-                                icon: Assets.icons.login.icGithub,
-                                onTap: () {},
-                              ),
-                              const SizedBox(height: 27),
                               _RegisterLink(colors: colors),
                             ],
                           ),
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                        padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
                         child: _AgreementFooter(colors: colors),
                       ),
                     ],
@@ -231,14 +214,12 @@ class _RegisterLink extends StatelessWidget {
             alignment: PlaceholderAlignment.baseline,
             baseline: TextBaseline.alphabetic,
             child: GestureDetector(
-              onTap: () {},
+              onTap: () =>
+                  Navigator.of(context).pushNamed(RoutesConstants.signup),
               child: EeagleText(
                 'Register Now',
-                style: EeagleTextStyles.bodyMedium.copyWith(
-                  decoration: TextDecoration.underline,
-                  decorationColor: colors.titleNatural,
-                ),
-                textColor: colors.titleNatural,
+                style: EeagleTextStyles.bodyMedium,
+                textColor: colors.brandPrimary,
               ),
             ),
           ),
@@ -256,9 +237,7 @@ class _AgreementFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final linkStyle = EeagleTextStyles.bodySmall.copyWith(
-      color: colors.titleNatural,
-      decoration: TextDecoration.underline,
-      decorationColor: colors.titleNatural,
+      color: colors.brandPrimary,
     );
     final bodyStyle = EeagleTextStyles.bodySmall.copyWith(
       color: colors.bodyText,

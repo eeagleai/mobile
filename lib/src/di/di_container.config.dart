@@ -18,10 +18,10 @@ import '../data/service/analytics_api_service.dart' as _i873;
 import '../data/service/analytics_events_cache.dart' as _i489;
 import '../data/service/attachment_picker_service.dart' as _i471;
 import '../data/service/auth_session_store.dart' as _i1053;
-import '../data/service/device_installation_service.dart' as _i902;
-import '../data/service/firebase_messaging_service.dart' as _i903;
+import '../data/service/device_installation_service.dart' as _i42;
+import '../data/service/firebase_messaging_service.dart' as _i564;
 import '../data/service/live_assist_api_service.dart' as _i78;
-import '../data/service/mobile_device_api_service.dart' as _i904;
+import '../data/service/mobile_device_api_service.dart' as _i722;
 import '../data/service/site_analytics_socket_registry.dart' as _i268;
 import '../data/service/speech_to_text_service.dart' as _i795;
 import '../data/service/token_storage_service.dart' as _i721;
@@ -30,7 +30,7 @@ import '../domain/repository/auth_repository.dart' as _i306;
 import '../domain/repository/counter_repository.dart' as _i497;
 import '../domain/repository/live_assist_local_repository.dart' as _i707;
 import '../domain/repository/live_assist_repository.dart' as _i78;
-import '../domain/repository/mobile_device_repository.dart' as _i905;
+import '../domain/repository/mobile_device_repository.dart' as _i247;
 import '../domain/repository/sites_repository.dart' as _i440;
 import '../domain/use_case/acquire_site_analytics_socket_use_case.dart'
     as _i513;
@@ -52,10 +52,11 @@ import '../domain/use_case/release_site_analytics_socket_use_case.dart'
     as _i817;
 import '../domain/use_case/resolve_message_page_paths_use_case.dart' as _i673;
 import '../domain/use_case/restore_session_use_case.dart' as _i8;
-import '../domain/use_case/save_fcm_token_use_case.dart' as _i906;
+import '../domain/use_case/save_fcm_token_use_case.dart' as _i510;
 import '../domain/use_case/save_owner_message_use_case.dart' as _i876;
 import '../domain/use_case/send_live_assist_message_use_case.dart' as _i913;
-import '../domain/use_case/sync_fcm_token_use_case.dart' as _i907;
+import '../domain/use_case/signup_use_case.dart' as _i610;
+import '../domain/use_case/sync_fcm_token_use_case.dart' as _i889;
 import '../domain/use_case/watch_conversation_messages_use_case.dart' as _i939;
 import '../domain/use_case/watch_site_analytics_events_use_case.dart' as _i810;
 import '../domain/use_case/watch_site_analytics_socket_use_case.dart' as _i796;
@@ -71,6 +72,7 @@ import '../presentation/live_conversation/bloc/live_conversation_bloc.dart'
 import '../presentation/llm_chat/bloc/llm_chat_prompt_bloc.dart' as _i590;
 import '../presentation/llm_chat/bloc/llm_chat_session_bloc.dart' as _i937;
 import '../presentation/login/bloc/login_bloc.dart' as _i331;
+import '../presentation/signup/bloc/signup_bloc.dart' as _i959;
 import '../presentation/splash/bloc/auth_bootstrap_bloc.dart' as _i998;
 import 'register_module.dart' as _i291;
 
@@ -97,7 +99,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1053.AuthSessionStore>(
       () => registerModule.authSessionStore(),
     );
-    gh.lazySingleton<_i902.DeviceInstallationService>(
+    gh.lazySingleton<_i42.DeviceInstallationService>(
       () => registerModule.deviceInstallationService(),
     );
     gh.lazySingleton<_i268.SiteAnalyticsSocketRegistry>(
@@ -184,7 +186,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i440.SitesRepository>(
       () => registerModule.sitesRepository(gh<_i361.Dio>()),
     );
-    gh.lazySingleton<_i904.MobileDeviceApiService>(
+    gh.lazySingleton<_i722.MobileDeviceApiService>(
       () => registerModule.mobileDeviceApiService(gh<_i361.Dio>()),
     );
     gh.lazySingleton<_i873.AnalyticsApiService>(
@@ -222,29 +224,11 @@ extension GetItInjectableX on _i174.GetIt {
       () =>
           registerModule.liveAssistRepository(gh<_i78.LiveAssistApiService>()),
     );
-    gh.lazySingleton<_i905.MobileDeviceRepository>(
-      () => registerModule.mobileDeviceRepository(
-        gh<_i904.MobileDeviceApiService>(),
-      ),
-    );
-    gh.factory<_i906.SaveFcmTokenUseCase>(
-      () => registerModule.saveFcmTokenUseCase(
-        gh<_i905.MobileDeviceRepository>(),
-      ),
-    );
-    gh.lazySingleton<_i903.FirebaseMessagingService>(
-      () => registerModule.firebaseMessagingService(
-        gh<_i906.SaveFcmTokenUseCase>(),
-        gh<_i902.DeviceInstallationService>(),
-      ),
-    );
-    gh.factory<_i907.SyncFcmTokenUseCase>(
-      () => registerModule.syncFcmTokenUseCase(
-        gh<_i903.FirebaseMessagingService>(),
-      ),
-    );
     gh.factory<_i772.LoginUseCase>(
       () => registerModule.loginUseCase(gh<_i306.AuthRepository>()),
+    );
+    gh.factory<_i610.SignupUseCase>(
+      () => registerModule.signupUseCase(gh<_i306.AuthRepository>()),
     );
     gh.factory<_i8.RestoreSessionUseCase>(
       () => registerModule.restoreSessionUseCase(gh<_i306.AuthRepository>()),
@@ -258,12 +242,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i870.ClearLiveAssistLocalDataUseCase>(),
       ),
     );
-    gh.factory<_i998.AuthBootstrapBloc>(
-      () => registerModule.authBootstrapBloc(
-        gh<_i8.RestoreSessionUseCase>(),
-        gh<_i907.SyncFcmTokenUseCase>(),
-      ),
-    );
     gh.factory<_i178.GetSitesUseCase>(
       () => registerModule.getSitesUseCase(gh<_i440.SitesRepository>()),
     );
@@ -273,6 +251,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i252.IncrementCounterUseCase>(
       () =>
           registerModule.incrementCounterUseCase(gh<_i497.CounterRepository>()),
+    );
+    gh.factory<_i959.SignupBloc>(
+      () => registerModule.signupBloc(gh<_i610.SignupUseCase>()),
     );
     gh.factory<_i913.SendLiveAssistMessageUseCase>(
       () => registerModule.sendLiveAssistMessageUseCase(
@@ -289,14 +270,13 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i325.WatchSocketConnectionStatusUseCase>(),
       ),
     );
-    gh.factory<_i331.LoginBloc>(
-      () => registerModule.loginBloc(
-        gh<_i772.LoginUseCase>(),
-        gh<_i907.SyncFcmTokenUseCase>(),
-      ),
-    );
     gh.lazySingleton<_i495.AnalyticsRepository>(
       () => registerModule.analyticsRepository(gh<_i873.AnalyticsApiService>()),
+    );
+    gh.lazySingleton<_i247.MobileDeviceRepository>(
+      () => registerModule.mobileDeviceRepository(
+        gh<_i722.MobileDeviceApiService>(),
+      ),
     );
     gh.factory<_i513.AcquireSiteAnalyticsSocketUseCase>(
       () => registerModule.acquireSiteAnalyticsSocketUseCase(
@@ -333,6 +313,11 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i573.MarkConversationReadUseCase>(),
       ),
     );
+    gh.factory<_i510.SaveFcmTokenUseCase>(
+      () => registerModule.saveFcmTokenUseCase(
+        gh<_i247.MobileDeviceRepository>(),
+      ),
+    );
     gh.factory<_i106.HomeAnalyticsBloc>(
       () => registerModule.homeAnalyticsBloc(
         gh<_i667.GetAnalyticsStatsUseCase>(),
@@ -342,6 +327,29 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i796.WatchSiteAnalyticsSocketUseCase>(),
         gh<_i132.HasOpenSiteAnalyticsSocketUseCase>(),
         gh<_i669.IngestAnalyticsSocketFrameUseCase>(),
+      ),
+    );
+    gh.lazySingleton<_i564.FirebaseMessagingService>(
+      () => registerModule.firebaseMessagingService(
+        gh<_i510.SaveFcmTokenUseCase>(),
+        gh<_i42.DeviceInstallationService>(),
+      ),
+    );
+    gh.factory<_i889.SyncFcmTokenUseCase>(
+      () => registerModule.syncFcmTokenUseCase(
+        gh<_i564.FirebaseMessagingService>(),
+      ),
+    );
+    gh.factory<_i331.LoginBloc>(
+      () => registerModule.loginBloc(
+        gh<_i772.LoginUseCase>(),
+        gh<_i889.SyncFcmTokenUseCase>(),
+      ),
+    );
+    gh.factory<_i998.AuthBootstrapBloc>(
+      () => registerModule.authBootstrapBloc(
+        gh<_i8.RestoreSessionUseCase>(),
+        gh<_i889.SyncFcmTokenUseCase>(),
       ),
     );
     return this;

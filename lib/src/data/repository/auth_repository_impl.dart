@@ -3,19 +3,18 @@ import 'package:eeagle_ai/src/core/config/api_config.dart';
 import 'package:eeagle_ai/src/core/logging/app_logger.dart';
 import 'package:eeagle_ai/src/data/models/mobile_login_request_model.dart';
 import 'package:eeagle_ai/src/data/models/mobile_login_response_model.dart';
+import 'package:eeagle_ai/src/data/models/signup_request_model.dart';
+import 'package:eeagle_ai/src/data/models/signup_response_model.dart';
 import 'package:eeagle_ai/src/data/service/auth_session_store.dart';
 import 'package:eeagle_ai/src/data/service/token_storage_service.dart';
 import 'package:eeagle_ai/src/domain/failure/operation_failure.dart';
 import 'package:eeagle_ai/src/domain/model/auth_session.dart';
+import 'package:eeagle_ai/src/domain/model/signup_result.dart';
 import 'package:eeagle_ai/src/domain/repository/auth_repository.dart';
 import 'package:fpdart/fpdart.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  AuthRepositoryImpl(
-    this._dio,
-    this._tokenStorage,
-    this._sessionStore,
-  );
+  AuthRepositoryImpl(this._dio, this._tokenStorage, this._sessionStore);
 
   final Dio _dio;
   final TokenStorageService _tokenStorage;
@@ -93,16 +92,96 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  TaskEither<OperationFailure, SignupResult> signup({
+    required String email,
+    required String password,
+    required String passwordConfirmation,
+    required bool agree,
+  }) {
+    return TaskEither(() async {
+      try {
+        final sessionResponse = await _dio.get<Map<String, dynamic>>(
+          ApiConfig.authSessionPath,
+          options: Options(extra: const {'skipAuth': true}),
+        );
+        final csrfToken = sessionResponse.data?['csrf_token']?.toString();
+        if (csrfToken == null || csrfToken.isEmpty) {
+          return left(
+            const OperationFailure(
+              'Signup failed. Missing CSRF token.',
+              code: 'missing-csrf-token',
+            ),
+          );
+        }
+
+        final cookieHeader = _cookieHeader(sessionResponse);
+        final signupHeaders = <String, dynamic>{'X-CSRFToken': csrfToken};
+        if (cookieHeader != null) {
+          signupHeaders['Cookie'] = cookieHeader;
+        }
+
+        final response = await _dio.post<Map<String, dynamic>>(
+          ApiConfig.authSignupPath,
+          data: SignupRequestModel(
+            email: email.trim(),
+            password: password,
+            passwordConfirmation: passwordConfirmation,
+            agree: agree,
+          ).toJson(),
+          options: Options(
+            headers: signupHeaders,
+            extra: const {'skipAuth': true},
+            validateStatus: (status) =>
+                status != null && status >= 200 && status < 500,
+          ),
+        );
+
+        final data = response.data;
+        final statusCode = response.statusCode;
+        if (statusCode != null && statusCode >= 400) {
+          return left(
+            OperationFailure.fromResponse(statusCode: statusCode, data: data),
+          );
+        }
+
+        if (data == null) {
+          return left(
+            const OperationFailure(
+              'Signup failed. Empty response from server.',
+              code: 'empty-response',
+            ),
+          );
+        }
+
+        final signupResponse = SignupResponseModel.fromJson(data);
+        if (signupResponse.status != null && signupResponse.status != 'ok') {
+          return left(
+            OperationFailure(
+              signupResponse.message ?? 'Signup failed. Please try again.',
+              code: 'signup-rejected',
+            ),
+          );
+        }
+
+        return right(signupResponse.toEntity());
+      } on DioException catch (error, stackTrace) {
+        appLogger.w('signup failed', error: error, stackTrace: stackTrace);
+        return left(OperationFailure.fromDio(error));
+      } catch (error, stackTrace) {
+        appLogger.w('signup failed', error: error, stackTrace: stackTrace);
+        return left(OperationFailure(error.toString()));
+      }
+    });
+  }
+
+  @override
   TaskEither<OperationFailure, AuthSession> restoreSession() {
     return TaskEither(() async {
       try {
         final storedSession = await _tokenStorage.readSession();
         if (storedSession == null) {
           return left(
-            const OperationFailure(
-              'No saved session.',
-              code: 'no-session',
-            ),
+            const OperationFailure('No saved session.', code: 'no-session'),
           );
         }
 
@@ -119,7 +198,11 @@ class AuthRepositoryImpl implements AuthRepository {
         _sessionStore.setSession(storedSession);
         return right(storedSession);
       } catch (error, stackTrace) {
-        appLogger.w('restoreSession failed', error: error, stackTrace: stackTrace);
+        appLogger.w(
+          'restoreSession failed',
+          error: error,
+          stackTrace: stackTrace,
+        );
         return left(OperationFailure(error.toString()));
       }
     });
@@ -146,5 +229,21 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> _clearSession() async {
     _sessionStore.clear();
     await _tokenStorage.clearSession();
+  }
+
+  String? _cookieHeader(Response<dynamic> response) {
+    final cookies = response.headers.map['set-cookie'];
+    if (cookies == null || cookies.isEmpty) {
+      return null;
+    }
+
+    final values = cookies
+        .map((cookie) => cookie.split(';').first.trim())
+        .where((cookie) => cookie.isNotEmpty)
+        .toList();
+    if (values.isEmpty) {
+      return null;
+    }
+    return values.join('; ');
   }
 }

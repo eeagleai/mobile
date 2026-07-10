@@ -6,4 +6,6 @@ class RoutesConstants {
   static const String llmChat = '/llm-chat';
   static const String analytics = '/analytics';
   static const String liveConversation = '/live-conversation';
+  static const String signup = '/signup';
+  static const String signupVerification = '/signup-verification';
 }

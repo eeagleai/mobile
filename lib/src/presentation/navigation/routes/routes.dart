@@ -5,6 +5,8 @@ import 'package:eeagle_ai/src/presentation/home/home_screen.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/llm_chat_screen.dart';
 import 'package:eeagle_ai/src/presentation/login/login_screen.dart';
 import 'package:eeagle_ai/src/presentation/navigation/routes/routes_constants.dart';
+import 'package:eeagle_ai/src/presentation/signup/signup_screen.dart';
+import 'package:eeagle_ai/src/presentation/signup/signup_verification_screen.dart';
 import 'package:flutter/material.dart';
 
 class AppRoutes {
@@ -16,6 +18,24 @@ class AppRoutes {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const LoginScreen(),
+        );
+      case RoutesConstants.signup:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const SignupScreen(),
+        );
+      case RoutesConstants.signupVerification:
+        final args = settings.arguments;
+        if (args is! SignupVerificationScreenArgs) {
+          return MaterialPageRoute<void>(
+            settings: settings,
+            builder: (_) => const LoginScreen(),
+          );
+        }
+
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => SignupVerificationScreen(args: args),
         );
       case RoutesConstants.home:
         return MaterialPageRoute<void>(
