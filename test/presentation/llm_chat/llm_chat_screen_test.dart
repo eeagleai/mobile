@@ -10,7 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class _MockLlmChatSessionBloc extends MockBloc<LlmChatSessionEvent, LlmChatSessionState>
+class _MockLlmChatSessionBloc
+    extends MockBloc<LlmChatSessionEvent, LlmChatSessionState>
     implements LlmChatSessionBloc {}
 
 void main() {
@@ -32,9 +33,9 @@ void main() {
 
     sessionBloc = _MockLlmChatSessionBloc();
     when(() => sessionBloc.state).thenReturn(const LlmChatSessionState());
-    when(() => sessionBloc.stream).thenAnswer(
-      (_) => Stream.value(const LlmChatSessionState()),
-    );
+    when(
+      () => sessionBloc.stream,
+    ).thenAnswer((_) => Stream.value(const LlmChatSessionState()));
 
     if (di.isRegistered<LlmChatSessionBloc>()) {
       await di.unregister<LlmChatSessionBloc>();
@@ -48,22 +49,18 @@ void main() {
     await tester.pumpWidget(
       EeagleTheme(
         data: appTheme,
-        child: const MaterialApp(
-          home: LlmChatScreen(site: site),
-        ),
+        child: const MaterialApp(home: LlmChatScreen(site: site)),
       ),
     );
     await tester.pump();
 
-    expect(find.text('Aurenix Demo'), findsOneWidget);
+    expect(find.text('eeagle.ai'), findsOneWidget);
     expect(find.text('demo.eeagle.ai'), findsOneWidget);
-    expect(find.text('42 changes remaining'), findsOneWidget);
+    expect(find.textContaining('42 changes remaining'), findsOneWidget);
+    expect(find.text('Preview'), findsOneWidget);
     expect(find.byType(LlmChatBackButton), findsOneWidget);
-    expect(
-      find.textContaining('How can I help you with'),
-      findsOneWidget,
-    );
-    expect(find.textContaining('Aurenix Demo today?'), findsOneWidget);
+    expect(find.textContaining('How can I help you bring'), findsOneWidget);
+    expect(find.textContaining('Aurenix Demo'), findsWidgets);
     expect(find.byIcon(Icons.add), findsNothing);
   });
 }

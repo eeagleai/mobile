@@ -17,6 +17,13 @@ ChatInboundEvent? mapChatInboundFrame(Map<String, dynamic> frame) {
     return null;
   }
 
+  // Kickoff frames are background site analysis, not replies to a message the
+  // user sent in this chat. Ignore the whole frame so its payload and finish
+  // signal cannot create a chat bubble or a no-response fallback.
+  if (frame['kickoff'] == true) {
+    return null;
+  }
+
   switch (type) {
     // Connection/lifecycle updates (e.g. "processing", "idle").
     case 'status':
@@ -63,8 +70,9 @@ ChatInboundEvent? _mapMessageFrame(Map<String, dynamic> frame) {
   }
 
   final role = frame['role'];
-  final messageRole =
-      role is String ? mapChatMessageRole(role) : ChatMessageRole.assistant;
+  final messageRole = role is String
+      ? mapChatMessageRole(role)
+      : ChatMessageRole.assistant;
 
   return ChatInboundEvent.message(
     role: messageRole,
@@ -84,8 +92,9 @@ ChatInboundEvent? _mapStreamingChunkFrame(Map<String, dynamic> frame) {
   }
 
   final role = frame['role'];
-  final messageRole =
-      role is String ? mapChatMessageRole(role) : ChatMessageRole.assistant;
+  final messageRole = role is String
+      ? mapChatMessageRole(role)
+      : ChatMessageRole.assistant;
 
   return ChatInboundEvent.message(
     role: messageRole,
@@ -149,7 +158,8 @@ List<String> _pageUrlsForRole(
 /// Builds an error event, tolerating the various shapes the backend may send.
 ChatInboundEvent? _mapErrorFrame(Map<String, dynamic> frame) {
   // Pick the first usable error label, falling back through likely keys.
-  final error = _stringOrNull(frame['error']) ??
+  final error =
+      _stringOrNull(frame['error']) ??
       _stringOrNull(frame['message']) ??
       _stringOrNull(frame['type']);
   if (error == null || error.isEmpty) {
@@ -159,7 +169,8 @@ ChatInboundEvent? _mapErrorFrame(Map<String, dynamic> frame) {
   // The extra detail may be a plain string, a nested object, or buried
   // elsewhere in the frame — try each in turn.
   final detail = frame['detail'];
-  final detailText = _stringOrNull(detail) ??
+  final detailText =
+      _stringOrNull(detail) ??
       (detail is Map<String, dynamic> ? extractChatFrameText(detail) : null) ??
       extractChatFrameText(frame);
 

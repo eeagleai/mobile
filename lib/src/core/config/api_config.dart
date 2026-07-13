@@ -11,6 +11,7 @@ class ApiConfig {
   static const String authSessionPath = '/api/auth/session';
   static const String authSignupPath = '/api/auth/signup';
   static const String sitesPath = '/api/sites';
+  static const String earlyAccessPath = '/earlyaccess';
   static const String chatTokenPath = '/api/chat/token';
   static const String defaultChatModel = 'eeagle-default';
 

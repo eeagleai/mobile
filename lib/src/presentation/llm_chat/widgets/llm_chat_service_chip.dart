@@ -25,11 +25,12 @@ class LlmChatServiceChip extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(100),
+        borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(100),
+            color: colors.inputSurface.withValues(alpha: .62),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(color: colors.chipBorder, width: 0.5),
           ),
           child: Row(
