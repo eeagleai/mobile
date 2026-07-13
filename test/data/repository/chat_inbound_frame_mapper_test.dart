@@ -4,6 +4,28 @@ import 'package:eeagle_ai/src/domain/model/chat_message.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('ignores kickoff assistant finished frames', () {
+    final event = mapChatInboundFrame({
+      'type': 'assistant_finished',
+      'kickoff': true,
+      'payload': {
+        'user': 'Background website analysis that must not appear in chat.',
+        'page_urls': ['https://example.eeagle.ai/'],
+      },
+    });
+
+    expect(event, isNull);
+  });
+
+  test('keeps normal assistant finished frames', () {
+    final event = mapChatInboundFrame({
+      'type': 'assistant_finished',
+      'kickoff': false,
+    });
+
+    expect(event, isA<ChatInboundAssistantFinishedEvent>());
+  });
+
   test('maps assistant message with content field', () {
     final event = mapChatInboundFrame({
       'type': 'message',
@@ -41,10 +63,7 @@ void main() {
   });
 
   test('maps streaming delta frames', () {
-    final event = mapChatInboundFrame({
-      'type': 'delta',
-      'delta': 'Hi',
-    });
+    final event = mapChatInboundFrame({'type': 'delta', 'delta': 'Hi'});
 
     expect(event, isA<ChatInboundMessageEvent>());
     final message = event! as ChatInboundMessageEvent;
@@ -56,9 +75,7 @@ void main() {
     final event = mapChatInboundFrame({
       'type': 'assistant_error',
       'error': 'assistant_error',
-      'detail': {
-        'message': 'LLM HTTP 401 Unauthorized invalid_api_key',
-      },
+      'detail': {'message': 'LLM HTTP 401 Unauthorized invalid_api_key'},
     });
 
     expect(event, isA<ChatInboundErrorEvent>());
@@ -81,7 +98,10 @@ void main() {
     expect(event, isA<ChatInboundMessageEvent>());
     final message = event! as ChatInboundMessageEvent;
     expect(message.role, ChatMessageRole.assistant);
-    expect(message.content, "I'm doing well, thanks! How can I help you today?");
+    expect(
+      message.content,
+      "I'm doing well, thanks! How can I help you today?",
+    );
   });
 
   test('extracts single page_urls from assistant_message payload', () {
@@ -130,13 +150,10 @@ void main() {
 
     expect(event, isA<ChatInboundMessageEvent>());
     final message = event! as ChatInboundMessageEvent;
-    expect(
-      message.pageUrls,
-      [
-        'https://wedding.eeagle.ai/flowers',
-        'https://wedding.eeagle.ai/about',
-      ],
-    );
+    expect(message.pageUrls, [
+      'https://wedding.eeagle.ai/flowers',
+      'https://wedding.eeagle.ai/about',
+    ]);
   });
 
   test('keeps root path page_urls from payload', () {
@@ -201,9 +218,7 @@ void main() {
     final event = mapChatInboundFrame({
       'type': 'error',
       'error': 'assistant_error',
-      'detail': {
-        'text': 'Invalid API Key',
-      },
+      'detail': {'text': 'Invalid API Key'},
     });
 
     expect(event, isA<ChatInboundErrorEvent>());

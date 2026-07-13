@@ -56,9 +56,9 @@ class _LlmChatMessageListState extends State<LlmChatMessageList> {
   Widget build(BuildContext context) {
     return ListView.separated(
       controller: _scrollController,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      padding: const EdgeInsets.fromLTRB(16, 18, 16, 20),
       itemCount: widget.messages.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
+      separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
         return LlmChatMessageBubble(
           message: widget.messages[index],

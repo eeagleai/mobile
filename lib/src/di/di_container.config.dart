@@ -64,6 +64,7 @@ import '../domain/use_case/watch_site_conversations_use_case.dart' as _i1031;
 import '../domain/use_case/watch_socket_connection_status_use_case.dart'
     as _i325;
 import '../presentation/analytics/bloc/analytics_bloc.dart' as _i1046;
+import '../presentation/home/bloc/create_website_bloc.dart' as _i344;
 import '../presentation/home/bloc/home_analytics_bloc.dart' as _i106;
 import '../presentation/home/bloc/home_bloc.dart' as _i355;
 import '../presentation/home/bloc/sites_bloc.dart' as _i797;
@@ -173,6 +174,18 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i673.ResolveMessagePagePathsUseCase>(),
       ),
     );
+    gh.lazySingleton<_i440.SitesRepository>(
+      () => registerModule.sitesRepository(
+        gh<_i361.Dio>(),
+        gh<_i1053.AuthSessionStore>(),
+      ),
+    );
+    gh.factory<_i178.GetSitesUseCase>(
+      () => registerModule.getSitesUseCase(gh<_i440.SitesRepository>()),
+    );
+    gh.factory<_i344.CreateWebsiteBloc>(
+      () => registerModule.createWebsiteBloc(gh<_i440.SitesRepository>()),
+    );
     gh.lazySingleton<_i306.AuthRepository>(
       () => registerModule.authRepository(
         gh<_i361.Dio>(),
@@ -182,9 +195,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i497.CounterRepository>(
       () => registerModule.counterRepository(gh<_i361.Dio>()),
-    );
-    gh.lazySingleton<_i440.SitesRepository>(
-      () => registerModule.sitesRepository(gh<_i361.Dio>()),
     );
     gh.lazySingleton<_i722.MobileDeviceApiService>(
       () => registerModule.mobileDeviceApiService(gh<_i361.Dio>()),
@@ -242,8 +252,8 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i870.ClearLiveAssistLocalDataUseCase>(),
       ),
     );
-    gh.factory<_i178.GetSitesUseCase>(
-      () => registerModule.getSitesUseCase(gh<_i440.SitesRepository>()),
+    gh.factory<_i797.SitesBloc>(
+      () => registerModule.sitesBloc(gh<_i178.GetSitesUseCase>()),
     );
     gh.factory<_i252.GetCounterUseCase>(
       () => registerModule.getCounterUseCase(gh<_i497.CounterRepository>()),
@@ -299,9 +309,6 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.getAnalyticsEventsUseCase(
         gh<_i495.AnalyticsRepository>(),
       ),
-    );
-    gh.factory<_i797.SitesBloc>(
-      () => registerModule.sitesBloc(gh<_i178.GetSitesUseCase>()),
     );
     gh.factory<_i1046.AnalyticsBloc>(
       () => registerModule.analyticsBloc(

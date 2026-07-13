@@ -62,6 +62,7 @@ import 'package:eeagle_ai/src/presentation/analytics/bloc/analytics_bloc.dart';
 import 'package:eeagle_ai/src/presentation/home/bloc/home_analytics_bloc.dart';
 import 'package:eeagle_ai/src/presentation/home/bloc/home_bloc.dart';
 import 'package:eeagle_ai/src/presentation/home/bloc/sites_bloc.dart';
+import 'package:eeagle_ai/src/presentation/home/bloc/create_website_bloc.dart';
 import 'package:eeagle_ai/src/presentation/live_conversation/bloc/live_conversation_bloc.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/bloc/llm_chat_prompt_bloc.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/bloc/llm_chat_session_bloc.dart';
@@ -102,7 +103,8 @@ abstract class RegisterModule {
   ) => AuthRepositoryImpl(dio, tokenStorageService, authSessionStore);
 
   @lazySingleton
-  SitesRepository sitesRepository(Dio dio) => SitesRepositoryImpl(dio);
+  SitesRepository sitesRepository(Dio dio, AuthSessionStore authSessionStore) =>
+      SitesRepositoryImpl(dio, authSessionStore);
 
   @lazySingleton
   MobileDeviceApiService mobileDeviceApiService(Dio dio) =>
@@ -207,6 +209,10 @@ abstract class RegisterModule {
   @factoryMethod
   SitesBloc sitesBloc(GetSitesUseCase getSitesUseCase) =>
       SitesBloc(getSitesUseCase);
+
+  @factoryMethod
+  CreateWebsiteBloc createWebsiteBloc(SitesRepository sitesRepository) =>
+      CreateWebsiteBloc(sitesRepository);
 
   @factoryMethod
   AttachmentPickerService attachmentPickerService() =>

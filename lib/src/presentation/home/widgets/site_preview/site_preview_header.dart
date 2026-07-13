@@ -32,76 +32,84 @@ class SitePreviewHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = EeagleTheme.of(context).colors;
-    final isEeagleHost = previewSheetIsEeagleHost(previewSheetDisplayHost(displayUrl));
+    final isEeagleHost = previewSheetIsEeagleHost(
+      previewSheetDisplayHost(displayUrl),
+    );
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _SitePreviewFavicon(isEeagleHost: isEeagleHost),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                EeagleText(
-                  displayTitle,
-                  style: EeagleTextStyles.titleMedium,
-                  textColor: colors.titleNatural,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Row(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SitePreviewFavicon(isEeagleHost: isEeagleHost),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      isSecure
-                          ? Icons.lock_rounded
-                          : Icons.lock_open_rounded,
-                      size: 14,
-                      color: colors.foregroundSecondary,
+                    EeagleText(
+                      displayTitle,
+                      style: EeagleTextStyles.titleMedium,
+                      textColor: colors.titleNatural,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: EeagleText(
-                        displayUrl,
-                        style: EeagleTextStyles.bodySmall,
-                        textColor: colors.foregroundSecondary,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                if (isSecure) ...[
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.verified_user_outlined,
-                        size: 14,
-                        color: colors.success,
-                      ),
-                      const SizedBox(width: 6),
-                      Flexible(
-                        child: EeagleText(
-                          'Secure connection',
-                          style: EeagleTextStyles.bodySmall,
-                          textColor: colors.success,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          isSecure
+                              ? Icons.lock_rounded
+                              : Icons.lock_open_rounded,
+                          size: 14,
+                          color: colors.foregroundSecondary,
                         ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: EeagleText(
+                            displayUrl,
+                            style: EeagleTextStyles.bodySmall,
+                            textColor: colors.foregroundSecondary,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (isSecure) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.verified_user_outlined,
+                            size: 14,
+                            color: colors.success,
+                          ),
+                          const SizedBox(width: 6),
+                          EeagleText(
+                            'Secure connection',
+                            style: EeagleTextStyles.bodySmall,
+                            textColor: colors.success,
+                          ),
+                        ],
                       ),
                     ],
-                  ),
-                ],
-              ],
-            ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              _SitePreviewNavButton(
+                icon: Icons.close_rounded,
+                onPressed: onClose,
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
+          const SizedBox(height: 12),
           Row(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               _SitePreviewNavButton(
                 icon: Icons.arrow_back_rounded,
@@ -116,11 +124,6 @@ class SitePreviewHeader extends StatelessWidget {
               _SitePreviewNavButton(
                 icon: Icons.refresh_rounded,
                 onPressed: onRefresh,
-              ),
-              const SizedBox(width: 8),
-              _SitePreviewNavButton(
-                icon: Icons.close_rounded,
-                onPressed: onClose,
               ),
             ],
           ),
@@ -149,10 +152,7 @@ class _SitePreviewFavicon extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: isEeagleHost
-          ? Image.asset(
-              Assets.icons.eegaleIc.path,
-              fit: BoxFit.cover,
-            )
+          ? Image.asset(Assets.icons.eegaleIc.path, fit: BoxFit.cover)
           : Icon(
               Icons.language_rounded,
               color: colors.foregroundSecondary,
@@ -163,10 +163,7 @@ class _SitePreviewFavicon extends StatelessWidget {
 }
 
 class _SitePreviewNavButton extends StatelessWidget {
-  const _SitePreviewNavButton({
-    required this.icon,
-    required this.onPressed,
-  });
+  const _SitePreviewNavButton({required this.icon, required this.onPressed});
 
   final IconData icon;
   final VoidCallback? onPressed;
