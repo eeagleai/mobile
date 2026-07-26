@@ -1,5 +1,6 @@
 import 'package:eeagle_ai/src/domain/model/site.dart';
 import 'package:eeagle_ai/src/presentation/home/bloc/home_analytics_bloc.dart';
+import 'package:eeagle_ai/src/presentation/home/widgets/home_website_thumbnail.dart';
 import 'package:eeagle_ai/src/presentation/ui/theme/eeagle_theme.dart';
 import 'package:eeagle_ai/src/presentation/ui/typography/eeagle_text.dart';
 import 'package:eeagle_ai/src/presentation/ui/typography/eeagle_text_style.dart';
@@ -47,7 +48,7 @@ class HomeSiteListTile extends StatelessWidget {
               // Top row: globe box · title/host · divider · action buttons.
               Row(
                 children: [
-                  _IconBox(icon: Icons.public_rounded, color: accent),
+                  HomeWebsiteThumbnail(site: site, size: 44, borderRadius: 14),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
@@ -73,11 +74,7 @@ class HomeSiteListTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Container(
-                    width: 1,
-                    height: 40,
-                    color: colors.chipBorder,
-                  ),
+                  Container(width: 1, height: 40, color: colors.chipBorder),
                   const SizedBox(width: 12),
                   _IconBox(
                     icon: Icons.open_in_new_rounded,
@@ -167,7 +164,9 @@ class _IconBox extends StatelessWidget {
       ),
     );
 
-    return tooltip == null ? tappable : Tooltip(message: tooltip!, child: tappable);
+    return tooltip == null
+        ? tappable
+        : Tooltip(message: tooltip!, child: tappable);
   }
 }
 
@@ -274,8 +273,9 @@ class _VisitorsStatChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final analytics =
-        context.select((HomeAnalyticsBloc bloc) => bloc.state.forApikey(apikey));
+    final analytics = context.select(
+      (HomeAnalyticsBloc bloc) => bloc.state.forApikey(apikey),
+    );
     final stats = analytics.stats;
 
     // No stats yet: dim placeholder while loading, retry on error.
@@ -285,9 +285,9 @@ class _VisitorsStatChip extends StatelessWidget {
         value: '—',
         label: 'unique visitors',
         onTap: analytics.hasError
-            ? () => context
-                .read<HomeAnalyticsBloc>()
-                .add(HomeAnalyticsEvent.siteRefreshRequested(apikey))
+            ? () => context.read<HomeAnalyticsBloc>().add(
+                HomeAnalyticsEvent.siteRefreshRequested(apikey),
+              )
             : null,
       );
     }

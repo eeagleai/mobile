@@ -25,14 +25,22 @@ final _websitePrompts = [
 ];
 
 class CreateWebsiteDialog extends StatefulWidget {
-  const CreateWebsiteDialog({super.key});
+  const CreateWebsiteDialog({super.key, this.initialPrompt = ''});
+
+  final String initialPrompt;
 
   @override
   State<CreateWebsiteDialog> createState() => _CreateWebsiteDialogState();
 }
 
 class _CreateWebsiteDialogState extends State<CreateWebsiteDialog> {
-  final _controller = TextEditingController();
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialPrompt);
+  }
 
   @override
   void dispose() {
