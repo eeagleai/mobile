@@ -4,6 +4,7 @@ class Site {
     required this.siteId,
     required this.name,
     required this.host,
+    this.thumbnailUrl,
     this.subscriptionStatus,
     this.quotaRemaining,
   });
@@ -12,6 +13,7 @@ class Site {
   final String siteId;
   final String name;
   final String host;
+  final String? thumbnailUrl;
   final String? subscriptionStatus;
   final int? quotaRemaining;
 }

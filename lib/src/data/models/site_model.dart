@@ -1,5 +1,6 @@
 import 'package:eeagle_ai/src/data/models/site_quota_model.dart';
 import 'package:eeagle_ai/src/domain/model/site.dart';
+import 'package:eeagle_ai/src/data/service/website_thumbnail_service.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'site_model.freezed.dart';
@@ -27,6 +28,7 @@ abstract class SiteModel with _$SiteModel {
       siteId: siteId,
       name: name,
       host: host,
+      thumbnailUrl: WebsiteThumbnailService.thumbnailUrl(host),
       subscriptionStatus: subscriptionStatus,
       quotaRemaining: quota?.remaining,
     );

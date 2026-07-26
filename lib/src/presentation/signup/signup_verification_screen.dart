@@ -39,7 +39,7 @@ class SignupVerificationScreen extends StatelessWidget {
 
     if (_loginBloc != null) {
       return BlocProvider.value(
-        value: _loginBloc!,
+        value: _loginBloc,
         child: child,
       );
     }
