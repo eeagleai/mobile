@@ -61,7 +61,7 @@ extension LlmChatSessionEventPatterns on LlmChatSessionEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Started value)?  started,TResult Function( _MessageSent value)?  messageSent,TResult Function( _InboundEventReceived value)?  inboundEventReceived,TResult Function( _Disposed value)?  disposed,TResult Function( _PreviewActionConsumed value)?  previewActionConsumed,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Started value)?  started,TResult Function( _MessageSent value)?  messageSent,TResult Function( _InboundEventReceived value)?  inboundEventReceived,TResult Function( _Disposed value)?  disposed,TResult Function( _PreviewActionConsumed value)?  previewActionConsumed,TResult Function( _WebsiteRolledBack value)?  websiteRolledBack,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _Started() when started != null:
@@ -69,7 +69,8 @@ return started(_that);case _MessageSent() when messageSent != null:
 return messageSent(_that);case _InboundEventReceived() when inboundEventReceived != null:
 return inboundEventReceived(_that);case _Disposed() when disposed != null:
 return disposed(_that);case _PreviewActionConsumed() when previewActionConsumed != null:
-return previewActionConsumed(_that);case _:
+return previewActionConsumed(_that);case _WebsiteRolledBack() when websiteRolledBack != null:
+return websiteRolledBack(_that);case _:
   return orElse();
 
 }
@@ -87,7 +88,7 @@ return previewActionConsumed(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Started value)  started,required TResult Function( _MessageSent value)  messageSent,required TResult Function( _InboundEventReceived value)  inboundEventReceived,required TResult Function( _Disposed value)  disposed,required TResult Function( _PreviewActionConsumed value)  previewActionConsumed,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Started value)  started,required TResult Function( _MessageSent value)  messageSent,required TResult Function( _InboundEventReceived value)  inboundEventReceived,required TResult Function( _Disposed value)  disposed,required TResult Function( _PreviewActionConsumed value)  previewActionConsumed,required TResult Function( _WebsiteRolledBack value)  websiteRolledBack,}){
 final _that = this;
 switch (_that) {
 case _Started():
@@ -95,7 +96,8 @@ return started(_that);case _MessageSent():
 return messageSent(_that);case _InboundEventReceived():
 return inboundEventReceived(_that);case _Disposed():
 return disposed(_that);case _PreviewActionConsumed():
-return previewActionConsumed(_that);}
+return previewActionConsumed(_that);case _WebsiteRolledBack():
+return websiteRolledBack(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -109,7 +111,7 @@ return previewActionConsumed(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Started value)?  started,TResult? Function( _MessageSent value)?  messageSent,TResult? Function( _InboundEventReceived value)?  inboundEventReceived,TResult? Function( _Disposed value)?  disposed,TResult? Function( _PreviewActionConsumed value)?  previewActionConsumed,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Started value)?  started,TResult? Function( _MessageSent value)?  messageSent,TResult? Function( _InboundEventReceived value)?  inboundEventReceived,TResult? Function( _Disposed value)?  disposed,TResult? Function( _PreviewActionConsumed value)?  previewActionConsumed,TResult? Function( _WebsiteRolledBack value)?  websiteRolledBack,}){
 final _that = this;
 switch (_that) {
 case _Started() when started != null:
@@ -117,7 +119,8 @@ return started(_that);case _MessageSent() when messageSent != null:
 return messageSent(_that);case _InboundEventReceived() when inboundEventReceived != null:
 return inboundEventReceived(_that);case _Disposed() when disposed != null:
 return disposed(_that);case _PreviewActionConsumed() when previewActionConsumed != null:
-return previewActionConsumed(_that);case _:
+return previewActionConsumed(_that);case _WebsiteRolledBack() when websiteRolledBack != null:
+return websiteRolledBack(_that);case _:
   return null;
 
 }
@@ -134,14 +137,15 @@ return previewActionConsumed(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( Site site)?  started,TResult Function( String text)?  messageSent,TResult Function( ChatInboundEvent event)?  inboundEventReceived,TResult Function()?  disposed,TResult Function()?  previewActionConsumed,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( Site site)?  started,TResult Function( String text)?  messageSent,TResult Function( ChatInboundEvent event)?  inboundEventReceived,TResult Function()?  disposed,TResult Function()?  previewActionConsumed,TResult Function( int? quotaRemaining)?  websiteRolledBack,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Started() when started != null:
 return started(_that.site);case _MessageSent() when messageSent != null:
 return messageSent(_that.text);case _InboundEventReceived() when inboundEventReceived != null:
 return inboundEventReceived(_that.event);case _Disposed() when disposed != null:
 return disposed();case _PreviewActionConsumed() when previewActionConsumed != null:
-return previewActionConsumed();case _:
+return previewActionConsumed();case _WebsiteRolledBack() when websiteRolledBack != null:
+return websiteRolledBack(_that.quotaRemaining);case _:
   return orElse();
 
 }
@@ -159,14 +163,15 @@ return previewActionConsumed();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( Site site)  started,required TResult Function( String text)  messageSent,required TResult Function( ChatInboundEvent event)  inboundEventReceived,required TResult Function()  disposed,required TResult Function()  previewActionConsumed,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( Site site)  started,required TResult Function( String text)  messageSent,required TResult Function( ChatInboundEvent event)  inboundEventReceived,required TResult Function()  disposed,required TResult Function()  previewActionConsumed,required TResult Function( int? quotaRemaining)  websiteRolledBack,}) {final _that = this;
 switch (_that) {
 case _Started():
 return started(_that.site);case _MessageSent():
 return messageSent(_that.text);case _InboundEventReceived():
 return inboundEventReceived(_that.event);case _Disposed():
 return disposed();case _PreviewActionConsumed():
-return previewActionConsumed();}
+return previewActionConsumed();case _WebsiteRolledBack():
+return websiteRolledBack(_that.quotaRemaining);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -180,14 +185,15 @@ return previewActionConsumed();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( Site site)?  started,TResult? Function( String text)?  messageSent,TResult? Function( ChatInboundEvent event)?  inboundEventReceived,TResult? Function()?  disposed,TResult? Function()?  previewActionConsumed,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( Site site)?  started,TResult? Function( String text)?  messageSent,TResult? Function( ChatInboundEvent event)?  inboundEventReceived,TResult? Function()?  disposed,TResult? Function()?  previewActionConsumed,TResult? Function( int? quotaRemaining)?  websiteRolledBack,}) {final _that = this;
 switch (_that) {
 case _Started() when started != null:
 return started(_that.site);case _MessageSent() when messageSent != null:
 return messageSent(_that.text);case _InboundEventReceived() when inboundEventReceived != null:
 return inboundEventReceived(_that.event);case _Disposed() when disposed != null:
 return disposed();case _PreviewActionConsumed() when previewActionConsumed != null:
-return previewActionConsumed();case _:
+return previewActionConsumed();case _WebsiteRolledBack() when websiteRolledBack != null:
+return websiteRolledBack(_that.quotaRemaining);case _:
   return null;
 
 }
@@ -200,7 +206,7 @@ return previewActionConsumed();case _:
 
 class _Started with DiagnosticableTreeMixin implements LlmChatSessionEvent {
   const _Started({required this.site});
-  
+
 
  final  Site site;
 
@@ -495,6 +501,78 @@ String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
 
 
 
+
+/// @nodoc
+
+
+class _WebsiteRolledBack with DiagnosticableTreeMixin implements LlmChatSessionEvent {
+  const _WebsiteRolledBack({this.quotaRemaining});
+
+
+ final  int? quotaRemaining;
+
+/// Create a copy of LlmChatSessionEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$WebsiteRolledBackCopyWith<_WebsiteRolledBack> get copyWith => __$WebsiteRolledBackCopyWithImpl<_WebsiteRolledBack>(this, _$identity);
+
+
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LlmChatSessionEvent.websiteRolledBack'))
+    ..add(DiagnosticsProperty('quotaRemaining', quotaRemaining));
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebsiteRolledBack&&(identical(other.quotaRemaining, quotaRemaining) || other.quotaRemaining == quotaRemaining));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,quotaRemaining);
+
+@override
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
+  return 'LlmChatSessionEvent.websiteRolledBack(quotaRemaining: $quotaRemaining)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$WebsiteRolledBackCopyWith<$Res> implements $LlmChatSessionEventCopyWith<$Res> {
+  factory _$WebsiteRolledBackCopyWith(_WebsiteRolledBack value, $Res Function(_WebsiteRolledBack) _then) = __$WebsiteRolledBackCopyWithImpl;
+@useResult
+$Res call({
+ int? quotaRemaining
+});
+
+
+
+
+}
+/// @nodoc
+class __$WebsiteRolledBackCopyWithImpl<$Res>
+    implements _$WebsiteRolledBackCopyWith<$Res> {
+  __$WebsiteRolledBackCopyWithImpl(this._self, this._then);
+
+  final _WebsiteRolledBack _self;
+  final $Res Function(_WebsiteRolledBack) _then;
+
+/// Create a copy of LlmChatSessionEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? quotaRemaining = freezed,}) {
+  return _then(_WebsiteRolledBack(
+quotaRemaining: freezed == quotaRemaining ? _self.quotaRemaining : quotaRemaining // ignore: cast_nullable_to_non_nullable
+as int?,
+  ));
+}
+
+
+}
 
 /// @nodoc
 mixin _$LlmChatSessionState implements DiagnosticableTreeMixin {

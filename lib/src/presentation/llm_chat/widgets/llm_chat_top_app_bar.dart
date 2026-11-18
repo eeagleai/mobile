@@ -13,6 +13,7 @@ class LlmChatTopAppBar extends StatelessWidget {
     this.quotaRemaining,
     this.onBackTap,
     this.onPreviewTap,
+    this.onVersionHistoryTap,
     this.isPreviewMode = false,
   });
 
@@ -20,6 +21,7 @@ class LlmChatTopAppBar extends StatelessWidget {
   final int? quotaRemaining;
   final VoidCallback? onBackTap;
   final VoidCallback? onPreviewTap;
+  final VoidCallback? onVersionHistoryTap;
   final bool isPreviewMode;
 
   @override
@@ -90,10 +92,26 @@ class LlmChatTopAppBar extends StatelessWidget {
                     ],
                   ),
                 ),
-                _RoundIconButton(
-                  icon: Icons.more_horiz_rounded,
+                PopupMenuButton<_ChatMenuAction>(
                   tooltip: 'More options',
-                  onPressed: () {},
+                  onSelected: (action) {
+                    if (action == _ChatMenuAction.versionHistory) {
+                      onVersionHistoryTap?.call();
+                    }
+                  },
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(
+                      value: _ChatMenuAction.versionHistory,
+                      child: Row(
+                        children: [
+                          Icon(Icons.history_rounded, size: 20),
+                          SizedBox(width: 10),
+                          Text('Version history'),
+                        ],
+                      ),
+                    ),
+                  ],
+                  icon: const Icon(Icons.more_horiz_rounded, size: 20),
                 ),
               ],
             ),
@@ -170,29 +188,4 @@ class _PreviewButton extends StatelessWidget {
   }
 }
 
-class _RoundIconButton extends StatelessWidget {
-  const _RoundIconButton({
-    required this.icon,
-    required this.tooltip,
-    this.onPressed,
-  });
-
-  final IconData icon;
-  final String tooltip;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = EeagleTheme.of(context).colors;
-    return IconButton(
-      tooltip: tooltip,
-      onPressed: onPressed,
-      icon: Icon(icon, size: 20),
-      color: colors.foregroundPrimary,
-      style: IconButton.styleFrom(
-        side: BorderSide(color: colors.chipBorder),
-        backgroundColor: colors.inputSurface.withValues(alpha: .55),
-      ),
-    );
-  }
-}
+enum _ChatMenuAction { versionHistory }

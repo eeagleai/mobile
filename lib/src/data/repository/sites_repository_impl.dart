@@ -2,9 +2,13 @@ import 'package:dio/dio.dart';
 import 'package:eeagle_ai/src/core/config/api_config.dart';
 import 'package:eeagle_ai/src/core/logging/app_logger.dart';
 import 'package:eeagle_ai/src/data/models/sites_response_model.dart';
+import 'package:eeagle_ai/src/data/models/site_revisions_response_model.dart';
+import 'package:eeagle_ai/src/data/models/site_rollback_response_model.dart';
 import 'package:eeagle_ai/src/data/service/auth_session_store.dart';
 import 'package:eeagle_ai/src/domain/failure/operation_failure.dart';
 import 'package:eeagle_ai/src/domain/model/site.dart';
+import 'package:eeagle_ai/src/domain/model/site_revision.dart';
+import 'package:eeagle_ai/src/domain/model/site_rollback_result.dart';
 import 'package:eeagle_ai/src/domain/repository/sites_repository.dart';
 import 'package:fpdart/fpdart.dart';
 
@@ -125,6 +129,112 @@ class SitesRepositoryImpl implements SitesRepository {
         return left(OperationFailure(error.toString()));
       }
     });
+  }
+
+  @override
+  TaskEither<OperationFailure, List<SiteRevision>> getSiteRevisions(
+    String siteApiKey,
+  ) {
+    return TaskEither(() async {
+      final path = ApiConfig.siteRevisionsPath(siteApiKey);
+      try {
+        final response = await _dio.get<Map<String, dynamic>>(path);
+        final data = response.data;
+        if (data == null) {
+          return left(
+            const OperationFailure(
+              'Failed to load version history. Empty response from server.',
+              code: 'empty-response',
+            ),
+          );
+        }
+        return right(SiteRevisionsResponseModel.fromJson(data).toEntities());
+      } on DioException catch (error, stackTrace) {
+        appLogger.w(
+          'getSiteRevisions failed',
+          error: error,
+          stackTrace: stackTrace,
+        );
+        return left(OperationFailure.fromDio(error));
+      } catch (error, stackTrace) {
+        appLogger.w(
+          'getSiteRevisions failed',
+          error: error,
+          stackTrace: stackTrace,
+        );
+        return left(OperationFailure(error.toString()));
+      }
+    });
+  }
+
+  @override
+  TaskEither<OperationFailure, SiteRollbackResult> rollbackSiteRevision({
+    required String siteApiKey,
+    required String revisionIdOrSha,
+  }) {
+    return TaskEither(() async {
+      final path = ApiConfig.siteRollbackPath(siteApiKey, revisionIdOrSha);
+      try {
+        final response = await _dio.post<Map<String, dynamic>>(path);
+        final data = response.data;
+        if (data == null) {
+          return left(
+            const OperationFailure(
+              'The website was restored, but the server returned no details.',
+              code: 'empty-response',
+            ),
+          );
+        }
+        return right(SiteRollbackResponseModel.fromJson(data).toEntity());
+      } on DioException catch (error, stackTrace) {
+        appLogger.w(
+          'rollbackSiteRevision failed',
+          error: error,
+          stackTrace: stackTrace,
+        );
+        return left(_rollbackFailure(error));
+      } catch (error, stackTrace) {
+        appLogger.w(
+          'rollbackSiteRevision failed',
+          error: error,
+          stackTrace: stackTrace,
+        );
+        return left(OperationFailure(error.toString()));
+      }
+    });
+  }
+
+  OperationFailure _rollbackFailure(DioException error) {
+    final statusCode = error.response?.statusCode;
+    final data = error.response?.data;
+    final errorCode = data is Map<String, dynamic>
+        ? data['error']?.toString()
+        : null;
+
+    return switch (statusCode) {
+      402 => const OperationFailure(
+        'You do not have enough change credits to restore this version.',
+        code: 'rollback-quota-exceeded',
+      ),
+      403 when errorCode == 'email_not_verified' => const OperationFailure(
+        'Verify your email before restoring a website version.',
+        code: 'email-not-verified',
+      ),
+      403 => const OperationFailure(
+        'You do not have permission to restore this website version.',
+        code: 'forbidden',
+      ),
+      404 => const OperationFailure(
+        'This website version is no longer available.',
+        code: 'revision-not-found',
+      ),
+      422 => const OperationFailure(
+        'This website version cannot be restored safely.',
+        code: 'rollback-unavailable',
+      ),
+      423 => OperationFailure.fromDio(error),
+      _ => OperationFailure.fromDio(error),
+    };
   }
 
   WebsiteBuildStatus _buildStatus(Map<String, dynamic> data) {

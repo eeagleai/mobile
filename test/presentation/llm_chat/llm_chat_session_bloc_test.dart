@@ -71,10 +71,12 @@ void main() {
     watchChatInboundEvents = _MockWatchChatInboundEventsUseCase();
     inboundEvents = StreamController<ChatInboundEvent>.broadcast();
 
-    when(() => watchChatInboundEvents()).thenAnswer((_) => inboundEvents.stream);
-    when(() => disconnectChatSession()).thenReturn(
-      TaskEither(() async => right(unit)),
-    );
+    when(
+      () => watchChatInboundEvents(),
+    ).thenAnswer((_) => inboundEvents.stream);
+    when(
+      () => disconnectChatSession(),
+    ).thenReturn(TaskEither(() async => right(unit)));
   });
 
   tearDown(() async {
@@ -115,10 +117,112 @@ void main() {
     },
     act: (bloc) => bloc.add(const LlmChatSessionEvent.started(site: _site)),
     expect: () => [
-      const LlmChatSessionState(connectionPhase: ChatConnectionPhase.connecting),
+      const LlmChatSessionState(
+        connectionPhase: ChatConnectionPhase.connecting,
+      ),
       const LlmChatSessionState(
         connectionPhase: ChatConnectionPhase.connected,
         quotaRemaining: 9,
+      ),
+    ],
+  );
+
+  blocTest<LlmChatSessionBloc, LlmChatSessionState>(
+    'reconnects after rollback, keeps messages, and applies updated quota',
+    build: () {
+      when(
+        () => mintChatToken(
+          apikey: any(named: 'apikey'),
+          pageUrl: any(named: 'pageUrl'),
+          model: any(named: 'model'),
+          newChat: true,
+        ),
+      ).thenReturn(TaskEither(() async => right(_session)));
+      when(
+        () => connectChatSession(
+          session: any(named: 'session'),
+          apikey: any(named: 'apikey'),
+          pageUrl: any(named: 'pageUrl'),
+          model: any(named: 'model'),
+        ),
+      ).thenReturn(TaskEither(() async => right(unit)));
+      return createBloc();
+    },
+    seed: () => const LlmChatSessionState(
+      connectionPhase: ChatConnectionPhase.connected,
+      quotaRemaining: 4,
+      messages: [
+        ChatMessage(
+          id: 'message-1',
+          role: ChatMessageRole.user,
+          content: 'Keep this message',
+        ),
+      ],
+    ),
+    act: (bloc) async {
+      bloc.add(const LlmChatSessionEvent.started(site: _site));
+      await bloc.stream.firstWhere(
+        (state) =>
+            state.connectionPhase == ChatConnectionPhase.connected &&
+            state.quotaRemaining == 9,
+      );
+      bloc.add(const LlmChatSessionEvent.websiteRolledBack(quotaRemaining: 8));
+    },
+    expect: () => [
+      const LlmChatSessionState(
+        connectionPhase: ChatConnectionPhase.connecting,
+        quotaRemaining: 4,
+        messages: [
+          ChatMessage(
+            id: 'message-1',
+            role: ChatMessageRole.user,
+            content: 'Keep this message',
+          ),
+        ],
+      ),
+      const LlmChatSessionState(
+        connectionPhase: ChatConnectionPhase.connected,
+        quotaRemaining: 9,
+        messages: [
+          ChatMessage(
+            id: 'message-1',
+            role: ChatMessageRole.user,
+            content: 'Keep this message',
+          ),
+        ],
+      ),
+      const LlmChatSessionState(
+        connectionPhase: ChatConnectionPhase.connecting,
+        quotaRemaining: 8,
+        messages: [
+          ChatMessage(
+            id: 'message-1',
+            role: ChatMessageRole.user,
+            content: 'Keep this message',
+          ),
+        ],
+      ),
+      const LlmChatSessionState(
+        connectionPhase: ChatConnectionPhase.connected,
+        quotaRemaining: 9,
+        messages: [
+          ChatMessage(
+            id: 'message-1',
+            role: ChatMessageRole.user,
+            content: 'Keep this message',
+          ),
+        ],
+      ),
+      const LlmChatSessionState(
+        connectionPhase: ChatConnectionPhase.connected,
+        quotaRemaining: 8,
+        messages: [
+          ChatMessage(
+            id: 'message-1',
+            role: ChatMessageRole.user,
+            content: 'Keep this message',
+          ),
+        ],
       ),
     ],
   );
@@ -179,15 +283,15 @@ void main() {
           newChat: any(named: 'newChat'),
         ),
       ).thenReturn(
-        TaskEither(
-          () async => left(const OperationFailure('Token failed')),
-        ),
+        TaskEither(() async => left(const OperationFailure('Token failed'))),
       );
       return createBloc();
     },
     act: (bloc) => bloc.add(const LlmChatSessionEvent.started(site: _site)),
     expect: () => [
-      const LlmChatSessionState(connectionPhase: ChatConnectionPhase.connecting),
+      const LlmChatSessionState(
+        connectionPhase: ChatConnectionPhase.connecting,
+      ),
       const LlmChatSessionState(
         connectionPhase: ChatConnectionPhase.error,
         errorMessage: 'Token failed',
@@ -280,7 +384,9 @@ void main() {
         );
     },
     expect: () => [
-      const LlmChatSessionState(connectionPhase: ChatConnectionPhase.connecting),
+      const LlmChatSessionState(
+        connectionPhase: ChatConnectionPhase.connecting,
+      ),
       const LlmChatSessionState(
         connectionPhase: ChatConnectionPhase.connected,
         quotaRemaining: 9,
@@ -495,9 +601,7 @@ void main() {
             content: 'Updated the homepage.',
           ),
         ],
-        previewAction: SitePreviewAction.open(
-          url: 'https://demo.eeagle.ai/',
-        ),
+        previewAction: SitePreviewAction.open(url: 'https://demo.eeagle.ai/'),
       ),
     ],
   );
@@ -581,15 +685,15 @@ void main() {
     build: () => createBloc(),
     seed: () => const LlmChatSessionState(
       connectionPhase: ChatConnectionPhase.idle,
-      previewAction: SitePreviewAction.open(url: 'https://demo.eeagle.ai/flowers'),
+      previewAction: SitePreviewAction.open(
+        url: 'https://demo.eeagle.ai/flowers',
+      ),
     ),
     act: (bloc) {
       bloc.add(const LlmChatSessionEvent.previewActionConsumed());
     },
     expect: () => [
-      const LlmChatSessionState(
-        connectionPhase: ChatConnectionPhase.idle,
-      ),
+      const LlmChatSessionState(connectionPhase: ChatConnectionPhase.idle),
     ],
   );
 
@@ -682,7 +786,9 @@ void main() {
       bloc.add(const LlmChatSessionEvent.messageSent(text: 'hi'));
     },
     expect: () => [
-      const LlmChatSessionState(connectionPhase: ChatConnectionPhase.connecting),
+      const LlmChatSessionState(
+        connectionPhase: ChatConnectionPhase.connecting,
+      ),
       const LlmChatSessionState(
         connectionPhase: ChatConnectionPhase.connected,
         quotaRemaining: 9,
@@ -795,7 +901,9 @@ void main() {
       bloc.add(const LlmChatSessionEvent.messageSent(text: 'hi'));
     },
     expect: () => [
-      const LlmChatSessionState(connectionPhase: ChatConnectionPhase.connecting),
+      const LlmChatSessionState(
+        connectionPhase: ChatConnectionPhase.connecting,
+      ),
       const LlmChatSessionState(
         connectionPhase: ChatConnectionPhase.connected,
         quotaRemaining: 9,

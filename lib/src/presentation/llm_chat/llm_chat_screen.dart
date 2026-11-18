@@ -10,6 +10,7 @@ import 'package:eeagle_ai/src/presentation/llm_chat/widgets/llm_chat_page_url_pi
 import 'package:eeagle_ai/src/presentation/llm_chat/widgets/llm_chat_live_preview.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/widgets/llm_chat_prompt_input_bar.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/widgets/llm_chat_top_app_bar.dart';
+import 'package:eeagle_ai/src/presentation/llm_chat/widgets/revision_history_sheet.dart';
 import 'package:eeagle_ai/src/presentation/ui/components/eeagle_screen_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -105,6 +106,32 @@ class _LlmChatViewState extends State<_LlmChatView> {
     await _previewController!.loadRequest(Uri.parse(url));
   }
 
+  Future<void> _showVersionHistory() async {
+    final result = await showRevisionHistorySheet(context, site: site);
+    if (result == null || !mounted) {
+      return;
+    }
+
+    context.read<LlmChatSessionBloc>().add(
+      LlmChatSessionEvent.websiteRolledBack(
+        quotaRemaining: result.quotaRemaining,
+      ),
+    );
+    if (_previewController != null) {
+      await _previewController!.reload();
+    }
+    if (!mounted) {
+      return;
+    }
+
+    final message = result.reloadSucceeded
+        ? 'Website version restored.'
+        : 'Website version restored. It may take a moment to appear.';
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocListener(
@@ -194,6 +221,7 @@ class _LlmChatViewState extends State<_LlmChatView> {
                             sessionState.quotaRemaining ?? site.quotaRemaining,
                         onBackTap: () => Navigator.of(context).maybePop(),
                         onPreviewTap: _togglePreviewMode,
+                        onVersionHistoryTap: _showVersionHistory,
                         isPreviewMode: _isPreviewMode,
                       );
                     },
