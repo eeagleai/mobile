@@ -20,6 +20,14 @@ class ApiConfig {
   static const String analyticsStreamTokenPath = '/api/analytics/stream-token';
   static const String liveAssistSendPath = '/api/live-assist/send';
   static const String mobileFcmTokenPath = '/api/mobile/devices/fcm-token';
+
+  static String siteRevisionsPath(String siteApiKey) =>
+      '/api/sites/${Uri.encodeComponent(siteApiKey)}/revisions';
+
+  static String siteRollbackPath(String siteApiKey, String revisionIdOrSha) =>
+      '/api/sites/${Uri.encodeComponent(siteApiKey)}/rollback/'
+      '${Uri.encodeComponent(revisionIdOrSha)}';
+
   static const Duration connectTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
 }

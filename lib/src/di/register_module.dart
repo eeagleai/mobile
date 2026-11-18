@@ -34,6 +34,7 @@ import 'package:eeagle_ai/src/domain/use_case/connect_chat_session_use_case.dart
 import 'package:eeagle_ai/src/domain/use_case/disconnect_chat_session_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/get_analytics_events_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/get_analytics_stats_use_case.dart';
+import 'package:eeagle_ai/src/domain/use_case/get_site_revisions_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/increment_counter_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/get_sites_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/has_open_site_analytics_socket_use_case.dart';
@@ -46,6 +47,7 @@ import 'package:eeagle_ai/src/domain/use_case/reconnect_site_analytics_socket_us
 import 'package:eeagle_ai/src/domain/use_case/release_site_analytics_socket_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/resolve_message_page_paths_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/restore_session_use_case.dart';
+import 'package:eeagle_ai/src/domain/use_case/rollback_site_revision_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/save_owner_message_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/send_chat_message_use_case.dart';
 import 'package:eeagle_ai/src/domain/use_case/send_live_assist_message_use_case.dart';
@@ -66,6 +68,7 @@ import 'package:eeagle_ai/src/presentation/home/bloc/create_website_bloc.dart';
 import 'package:eeagle_ai/src/presentation/live_conversation/bloc/live_conversation_bloc.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/bloc/llm_chat_prompt_bloc.dart';
 import 'package:eeagle_ai/src/presentation/llm_chat/bloc/llm_chat_session_bloc.dart';
+import 'package:eeagle_ai/src/presentation/llm_chat/bloc/revision_history_bloc.dart';
 import 'package:eeagle_ai/src/presentation/login/bloc/login_bloc.dart';
 import 'package:eeagle_ai/src/presentation/signup/bloc/signup_bloc.dart';
 import 'package:eeagle_ai/src/presentation/splash/bloc/auth_bootstrap_bloc.dart';
@@ -196,6 +199,23 @@ abstract class RegisterModule {
   @factoryMethod
   GetSitesUseCase getSitesUseCase(SitesRepository sitesRepository) =>
       GetSitesUseCase(sitesRepository);
+
+  @factoryMethod
+  GetSiteRevisionsUseCase getSiteRevisionsUseCase(
+    SitesRepository sitesRepository,
+  ) => GetSiteRevisionsUseCase(sitesRepository);
+
+  @factoryMethod
+  RollbackSiteRevisionUseCase rollbackSiteRevisionUseCase(
+    SitesRepository sitesRepository,
+  ) => RollbackSiteRevisionUseCase(sitesRepository);
+
+  @factoryMethod
+  RevisionHistoryBloc revisionHistoryBloc(
+    GetSiteRevisionsUseCase getSiteRevisionsUseCase,
+    RollbackSiteRevisionUseCase rollbackSiteRevisionUseCase,
+  ) =>
+      RevisionHistoryBloc(getSiteRevisionsUseCase, rollbackSiteRevisionUseCase);
 
   @factoryMethod
   SpeechToTextService speechToTextService() => SpeechToTextService();

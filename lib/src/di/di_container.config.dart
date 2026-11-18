@@ -37,6 +37,7 @@ import '../domain/use_case/acquire_site_analytics_socket_use_case.dart'
 import '../domain/use_case/clear_live_assist_local_data_use_case.dart' as _i870;
 import '../domain/use_case/get_analytics_events_use_case.dart' as _i767;
 import '../domain/use_case/get_analytics_stats_use_case.dart' as _i667;
+import '../domain/use_case/get_site_revisions_use_case.dart' as _i125;
 import '../domain/use_case/get_sites_use_case.dart' as _i178;
 import '../domain/use_case/has_open_site_analytics_socket_use_case.dart'
     as _i132;
@@ -52,6 +53,7 @@ import '../domain/use_case/release_site_analytics_socket_use_case.dart'
     as _i817;
 import '../domain/use_case/resolve_message_page_paths_use_case.dart' as _i673;
 import '../domain/use_case/restore_session_use_case.dart' as _i8;
+import '../domain/use_case/rollback_site_revision_use_case.dart' as _i501;
 import '../domain/use_case/save_fcm_token_use_case.dart' as _i510;
 import '../domain/use_case/save_owner_message_use_case.dart' as _i876;
 import '../domain/use_case/send_live_assist_message_use_case.dart' as _i913;
@@ -72,6 +74,7 @@ import '../presentation/live_conversation/bloc/live_conversation_bloc.dart'
     as _i1038;
 import '../presentation/llm_chat/bloc/llm_chat_prompt_bloc.dart' as _i590;
 import '../presentation/llm_chat/bloc/llm_chat_session_bloc.dart' as _i937;
+import '../presentation/llm_chat/bloc/revision_history_bloc.dart' as _i178;
 import '../presentation/login/bloc/login_bloc.dart' as _i331;
 import '../presentation/signup/bloc/signup_bloc.dart' as _i959;
 import '../presentation/splash/bloc/auth_bootstrap_bloc.dart' as _i998;
@@ -183,6 +186,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i178.GetSitesUseCase>(
       () => registerModule.getSitesUseCase(gh<_i440.SitesRepository>()),
     );
+    gh.factory<_i125.GetSiteRevisionsUseCase>(
+      () => registerModule.getSiteRevisionsUseCase(gh<_i440.SitesRepository>()),
+    );
+    gh.factory<_i501.RollbackSiteRevisionUseCase>(
+      () => registerModule.rollbackSiteRevisionUseCase(
+        gh<_i440.SitesRepository>(),
+      ),
+    );
     gh.factory<_i344.CreateWebsiteBloc>(
       () => registerModule.createWebsiteBloc(gh<_i440.SitesRepository>()),
     );
@@ -254,6 +265,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i797.SitesBloc>(
       () => registerModule.sitesBloc(gh<_i178.GetSitesUseCase>()),
+    );
+    gh.factory<_i178.RevisionHistoryBloc>(
+      () => registerModule.revisionHistoryBloc(
+        gh<_i125.GetSiteRevisionsUseCase>(),
+        gh<_i501.RollbackSiteRevisionUseCase>(),
+      ),
     );
     gh.factory<_i252.GetCounterUseCase>(
       () => registerModule.getCounterUseCase(gh<_i497.CounterRepository>()),

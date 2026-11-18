@@ -23,7 +23,8 @@ part 'llm_chat_session_event.dart';
 part 'llm_chat_session_state.dart';
 part 'llm_chat_session_bloc.freezed.dart';
 
-class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> {
+class LlmChatSessionBloc
+    extends Bloc<LlmChatSessionEvent, LlmChatSessionState> {
   static const _noResponseFallback =
       'No response received. Check that AI is configured for this site.';
 
@@ -39,6 +40,7 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
     on<_MessageSent>(_onMessageSent);
     on<_InboundEventReceived>(_onInboundEventReceived);
     on<_PreviewActionConsumed>(_onPreviewActionConsumed);
+    on<_WebsiteRolledBack>(_onWebsiteRolledBack);
     on<_Disposed>(_onDisposed);
   }
 
@@ -56,7 +58,10 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
   final List<String> _pendingPageUrls = [];
   bool _isChatConnected = false;
 
-  Future<void> _onStarted(_Started event, Emitter<LlmChatSessionState> emit) async {
+  Future<void> _onStarted(
+    _Started event,
+    Emitter<LlmChatSessionState> emit,
+  ) async {
     _site = event.site;
     emit(
       state.copyWith(
@@ -146,13 +151,11 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
 
   Future<void> _startInboundListener() async {
     await _inboundSubscription?.cancel();
-    _inboundSubscription = _watchChatInboundEvents().listen(
-      (event) {
-        if (!isClosed) {
-          add(LlmChatSessionEvent.inboundEventReceived(event));
-        }
-      },
-    );
+    _inboundSubscription = _watchChatInboundEvents().listen((event) {
+      if (!isClosed) {
+        add(LlmChatSessionEvent.inboundEventReceived(event));
+      }
+    });
   }
 
   Future<void> _onMessageSent(
@@ -217,18 +220,15 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
       return;
     }
 
-    result.match(
-      (failure) {
-        _isChatConnected = false;
-        emit(
-          state.copyWith(
-            connectionPhase: ChatConnectionPhase.idle,
-            errorMessage: failure.message,
-          ),
-        );
-      },
-      (_) {},
-    );
+    result.match((failure) {
+      _isChatConnected = false;
+      emit(
+        state.copyWith(
+          connectionPhase: ChatConnectionPhase.idle,
+          errorMessage: failure.message,
+        ),
+      );
+    }, (_) {});
   }
 
   void _onInboundEventReceived(
@@ -293,11 +293,7 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
         }
       case ChatInboundConnectionLostEvent():
         _isChatConnected = false;
-        emit(
-          state.copyWith(
-            connectionPhase: ChatConnectionPhase.idle,
-          ),
-        );
+        emit(state.copyWith(connectionPhase: ChatConnectionPhase.idle));
       case ChatInboundPongEvent():
         break;
     }
@@ -308,6 +304,33 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
     Emitter<LlmChatSessionState> emit,
   ) {
     emit(state.copyWith(previewAction: null));
+  }
+
+  Future<void> _onWebsiteRolledBack(
+    _WebsiteRolledBack event,
+    Emitter<LlmChatSessionState> emit,
+  ) async {
+    _isChatConnected = false;
+    _session = null;
+    _pendingPageUrls.clear();
+    await _disconnectChatSession().run();
+    if (emit.isDone) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        connectionPhase: ChatConnectionPhase.connecting,
+        quotaRemaining: event.quotaRemaining ?? state.quotaRemaining,
+        errorMessage: null,
+        previewAction: null,
+      ),
+    );
+
+    final connected = await _connect(emit, newChat: true);
+    if (connected && event.quotaRemaining != null && !emit.isDone) {
+      emit(state.copyWith(quotaRemaining: event.quotaRemaining));
+    }
   }
 
   void _mergePendingPageUrls(List<String> pageUrls) {
@@ -511,7 +534,8 @@ class LlmChatSessionBloc extends Bloc<LlmChatSessionEvent, LlmChatSessionState> 
       return true;
     }
 
-    return last.role == ChatMessageRole.assistant && last.content.trim().isEmpty;
+    return last.role == ChatMessageRole.assistant &&
+        last.content.trim().isEmpty;
   }
 
   List<ChatMessage> _appendAssistantFallback(List<ChatMessage> messages) {

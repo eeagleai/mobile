@@ -1,4 +1,6 @@
 import 'package:eeagle_ai/src/domain/model/site.dart';
+import 'package:eeagle_ai/src/domain/model/site_revision.dart';
+import 'package:eeagle_ai/src/domain/model/site_rollback_result.dart';
 import 'package:eeagle_ai/src/domain/failure/operation_failure.dart';
 import 'package:fpdart/fpdart.dart';
 
@@ -35,4 +37,13 @@ abstract class SitesRepository {
   TaskEither<OperationFailure, WebsiteBuildStatus> getWebsiteBuildStatus(
     WebsiteBuildStatus build,
   );
+
+  TaskEither<OperationFailure, List<SiteRevision>> getSiteRevisions(
+    String siteApiKey,
+  );
+
+  TaskEither<OperationFailure, SiteRollbackResult> rollbackSiteRevision({
+    required String siteApiKey,
+    required String revisionIdOrSha,
+  });
 }
